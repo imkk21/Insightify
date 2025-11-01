@@ -7,7 +7,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ChangePassword from "./pages/ChangePassword";
-
+import ChangeEmail from "./pages/ChangeEmail";
 import "./App.css";
 
 export default function App() {
@@ -38,6 +38,15 @@ export default function App() {
     </ProtectedRoute>
   }
 />
+<Route
+  path="/change-email"
+  element={
+    <ProtectedRoute>
+      <ChangeEmail />
+    </ProtectedRoute>
+  }
+/>
+
 
 
           {/* Default Fallback */}
