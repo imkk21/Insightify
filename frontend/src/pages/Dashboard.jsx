@@ -295,7 +295,25 @@ export default function Dashboard() {
 >
   Change Password
 </button>
+<button
+  onClick={() => (window.location.href = "/change-email")}
+  style={{
+    marginTop: "10px",
+    width: "100%",
+    padding: "10px",
+    border: "none",
+    borderRadius: "6px",
+    backgroundColor: "#17a2b8",
+    color: "#fff",
+    fontWeight: "bold",
+    cursor: "pointer",
+  }}
+>
+  Change Email
+</button>
+
 
     </div>
+
   );
 }
