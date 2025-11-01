@@ -7,7 +7,7 @@ import {
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   sendEmailVerification,
-  onAuthStateChanged, // ✅ optional export
+  onAuthStateChanged,
 } from "firebase/auth";
 
 const firebaseConfig = {
