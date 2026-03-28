@@ -1,18 +1,22 @@
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    provider: {
-      type: String,
-      enum: ["google", "firebase"],
-      default: "firebase",
-    },
-    avatar: { type: String, default: "" },
+    uid:             { type: String, required: true, unique: true },
+    email:           { type: String, required: true },
+    displayName:     { type: String, default: '' },
+    photoURL:        { type: String, default: '' },
+    // GitHub OAuth – set when user clicks "Connect GitHub"
+    githubUsername:  { type: String, default: '' },
+    githubToken:     { type: String, default: '' },  // user's personal OAuth token
+    githubConnected: { type: Boolean, default: false },
+    // Location – set from browser geolocation or manual entry
+    city:            { type: String, default: '' },
+    lat:             { type: Number, default: null },
+    lon:             { type: Number, default: null },
+    lastLogin:       { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
 
-const User = mongoose.model("User", userSchema);
-export default User;
+module.exports = mongoose.model('User', userSchema);

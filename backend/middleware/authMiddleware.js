@@ -1,23 +1,24 @@
-import { verifyFirebaseToken } from "../utils/verifyFirebaseToken.js";
-import User from "../models/User.js";
+const { admin } = require('../config/firebase');
 
-export const protect = async (req, res, next) => {
-  let token;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    try {
-      token = req.headers.authorization.split(" ")[1];
-      const decoded = await verifyFirebaseToken(token);
-      req.user = await User.findOne({ email: decoded.email }).select("-password");
-      if (!req.user) return res.status(401).json({ message: "User not found" });
-      next();
-    } catch (error) {
-      console.error("Auth Middleware Error:", error);
-      res.status(401).json({ message: "Not authorized, token failed" });
-    }
-  } else {
-    res.status(401).json({ message: "No token, authorization denied" });
+/**
+ * Middleware: verify Firebase ID token from Authorization header.
+ * Attaches decoded token to req.user.
+ */
+const verifyToken = async (req, res, next) => {
+  const header = req.headers.authorization;
+  if (!header || !header.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized – no token provided' });
+  }
+
+  const token = header.split(' ')[1];
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    req.user = decoded; // { uid, email, name, ... }
+    next();
+  } catch (err) {
+    console.error('Token verification failed:', err.message);
+    return res.status(401).json({ error: 'Unauthorized – invalid or expired token' });
   }
 };
+
+module.exports = { verifyToken };

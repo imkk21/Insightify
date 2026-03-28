@@ -1,12 +1,8 @@
-import express from "express";
-import { firebaseLogin, googleLogin } from "../controllers/authController.js";
+const router = require('express').Router();
+const { verifyToken } = require('../middleware/authMiddleware');
+const { loginOrRegister, getMe } = require('../controllers/authController');
 
-const router = express.Router();
+router.post('/login', verifyToken, loginOrRegister);
+router.get('/me',    verifyToken, getMe);
 
-// ✅ Firebase Email/Password Login (and registration auto handled)
-router.post("/firebase-login", firebaseLogin);
-
-// ✅ Google Login
-router.post("/google", googleLogin);
-
-export default router;
+module.exports = router;

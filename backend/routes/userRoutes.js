@@ -1,17 +1,8 @@
-import express from "express";
-import { protect } from "../middleware/authMiddleware.js";
-import upload from "../middleware/upload.js";
+const router = require('express').Router();
+const { verifyToken } = require('../middleware/authMiddleware');
+const { getProfile, updateProfile } = require('../controllers/userController');
 
-import {
-  getUserProfile,
-  updateUserProfile,
-  uploadAvatar,
-} from "../controllers/userController.js";
+router.get('/profile',   verifyToken, getProfile);
+router.patch('/profile', verifyToken, updateProfile);
 
-const router = express.Router();
-
-router.get("/profile", protect, getUserProfile);
-router.put("/update", protect, updateUserProfile);
-router.post("/upload-avatar", protect, upload.single("avatar"), uploadAvatar);
-
-export default router;
+module.exports = router;

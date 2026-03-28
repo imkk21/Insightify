@@ -1,56 +1,46 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthProvider";
-import Navbar from "./components/Navbar";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import Dashboard from "./pages/Dashboard";
-import ProtectedRoute from "./components/ProtectedRoute";
-import ChangePassword from "./pages/ChangePassword";
-import ChangeEmail from "./pages/ChangeEmail";
-import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Layout from './components/Layout';
+import LoginPage    from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import GithubPage   from './pages/GithubPage';
+import WeatherPage  from './pages/WeatherPage';
+import NewsPage     from './pages/NewsPage';
+import InsightPage  from './pages/InsightPage';
+import ActivityPage from './pages/ActivityPage';
+import SettingsPage from './pages/SettingsPage';
+import LoadingScreen from './components/LoadingScreen';
+
+const ProtectedRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user)   return <Navigate to="/login" replace />;
+  return children;
+};
+
+const PublicRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (user)    return <Navigate to="/" replace />;
+  return children;
+};
 
 export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-        <Navbar />
         <Routes>
-          {/* Public Routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-
-          {/* Protected Route */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-  path="/change-password"
-  element={
-    <ProtectedRoute>
-      <ChangePassword />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/change-email"
-  element={
-    <ProtectedRoute>
-      <ChangeEmail />
-    </ProtectedRoute>
-  }
-/>
-
-
-
-          {/* Default Fallback */}
-          <Route path="*" element={<Login />} />
+          <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route index           element={<DashboardPage />} />
+            <Route path="github"   element={<GithubPage />} />
+            <Route path="weather"  element={<WeatherPage />} />
+            <Route path="news"     element={<NewsPage />} />
+            <Route path="insight"  element={<InsightPage />} />
+            <Route path="activity" element={<ActivityPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+          </Route>
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
