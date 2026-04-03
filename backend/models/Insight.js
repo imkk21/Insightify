@@ -25,14 +25,16 @@ insightSchema.index({ uid: 1, createdAt: -1 });
 
 const Insight = mongoose.model('Insight', insightSchema);
 
-// Drop any legacy bad unique indexes on startup (fire-and-forget)
+// Self-Healing Index Protocol: Drop all bad legacy unique indexes (user_1, etc.)
 setTimeout(async () => {
   try {
-    await Insight.collection.dropIndex('user_1');
-    console.log('[DB] Dropped legacy index: insights.user_1');
-  } catch { /* already gone */ }
-  try {
-    await Insight.collection.dropIndex('uid_1_weekOf_1');
+    const indexes = await Insight.collection.indexes();
+    for (const idx of indexes) {
+      if (idx.unique && idx.name !== '_id_') {
+        await Insight.collection.dropIndex(idx.name);
+        console.log(`[DB] Dropped legacy unique index on insights: ${idx.name}`);
+      }
+    }
   } catch { /* already gone */ }
 }, 3000);
 
