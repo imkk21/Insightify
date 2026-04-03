@@ -24,6 +24,8 @@ export default function MusicFloatingPlayer() {
 
   // Viewport Boundary Safety Check
   const [safePos, setSafePos] = useState(lastPos);
+  const win = typeof window !== 'undefined' ? window : { innerWidth: 1200, innerHeight: 800 };
+
   useEffect(() => {
     const checkVisibility = () => {
       const maxX = window.innerWidth - 320;
@@ -37,13 +39,11 @@ export default function MusicFloatingPlayer() {
     return () => window.removeEventListener('resize', checkVisibility);
   }, [lastPos.x, lastPos.y]);
 
-  if (!selectedPlaylist) return null;
-
   return (
     <AnimatePresence>
       <motion.div
         drag
-        dragConstraints={{ left: 0, right: window.innerWidth - 300, top: 0, bottom: window.innerHeight - 100 }}
+        dragConstraints={{ left: 0, right: win.innerWidth - 300, top: 0, bottom: win.innerHeight - 100 }}
         dragElastic={0.1}
         dragMomentum={false}
         initial={{ opacity: 0, scale: 0.9, x: safePos.x, y: safePos.y }}
@@ -57,7 +57,7 @@ export default function MusicFloatingPlayer() {
           height: isMinimized ? '44px' : 'auto', 
           left: 0,
           top: 0,
-          scale: typeof window !== 'undefined' && window.innerWidth < 640 ? 0.85 : 1
+          scale: win.innerWidth < 640 ? 0.85 : 1
         }}
       >
         {/* Neural Drag Handle */}
