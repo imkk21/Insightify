@@ -89,6 +89,18 @@ export default function LoginPage() {
             )}
             Continue with Google
           </button>
+
+          {/iPhone|iPad|iPod|Android/i.test(window.navigator.userAgent) && (
+            <div className="mt-8 p-4 bg-amber/5 border border-amber/10 rounded-2xl flex gap-3">
+              <div className="w-5 h-5 rounded-full bg-amber/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-[10px] font-black text-amber">!</span>
+              </div>
+              <p className="text-[10px] text-ink3 leading-relaxed">
+                <span className="text-foreground font-bold uppercase tracking-wider block mb-1">Mobile Optimize</span>
+                For the best experience, open this link directly in <b>Safari</b> or <b>Chrome</b>. Some in-app browsers (like Instagram/GitHub) may block the login secure layer.
+              </p>
+            </div>
+          )}
         </motion.div>
       </div>
     </div>

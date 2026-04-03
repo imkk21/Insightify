@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { signInWithPopup, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged } from 'firebase/auth';
 import { auth, googleProvider } from '../services/firebase';
 import { authAPI } from '../services/api';
 
@@ -11,6 +11,20 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Handle redirect result if user just returned from login screen
+    getRedirectResult(auth)
+      .then(async (result) => {
+        if (result?.user) {
+          try {
+            const { data } = await authAPI.login();
+            setProfile(data.user);
+          } catch (e) {
+            console.error('Auth sync failed from redirect:', e.message);
+          }
+        }
+      })
+      .catch((err) => console.error('Redirect result error:', err));
+
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
@@ -29,8 +43,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const loginWithGoogle = async () => {
-    const result = await signInWithPopup(auth, googleProvider);
-    return result;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+       // On mobile, popups are often blocked, redirect is safer
+       return await signInWithRedirect(auth, googleProvider);
+    } else {
+       // On desktop, popups are a better UX
+       const result = await signInWithPopup(auth, googleProvider);
+       return result;
+    }
   };
 
   const logout = async () => {
