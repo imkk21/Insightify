@@ -62,6 +62,14 @@ const fetchGithubData = async (username, userToken) => {
   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   const weeklyCommits = recentCommits.filter((c) => c.date >= oneWeekAgo).length;
 
+  let productivityScore = 0;
+  productivityScore += Math.min(totalStars * 1.5, 30);
+  productivityScore += Math.min(profile.public_repos * 1.0, 20);
+  productivityScore += Math.min(weeklyCommits * 2.5, 30);
+  const langCount = Object.keys(langMap).length;
+  productivityScore += Math.min(langCount * 4, 20);
+  productivityScore = Math.floor(Math.min(100, Math.max(0, productivityScore)));
+
   return {
     username:     profile.login,
     totalRepos:   profile.public_repos,
@@ -73,6 +81,7 @@ const fetchGithubData = async (username, userToken) => {
     topRepos,
     recentCommits: recentCommits.slice(0, 20),
     weeklyCommits,
+    productivityScore,
     fetchedAt: new Date(),
   };
 };

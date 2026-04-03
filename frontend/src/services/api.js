@@ -52,6 +52,25 @@ export const insightAPI = {
   getHistory: (limit=10)  => api.get('/insight/history', { params: { limit } }),
   generate:   ()          => api.post('/insight/generate'),
   custom:     (prompt)    => api.post('/insight/custom', { prompt }),
+  refactor:   (code, lang) => api.post('/insight/refactor', { code, language: lang }),
+};
+
+export const spotifyAPI = {
+  getLoginUrl: () => api.get('/spotify/login'),
+  getStatus:   () => api.get('/spotify/status'),
+  getPlaylists: () => api.get('/spotify/playlists'),
+};
+
+export const focusAPI = {
+  getSessions: () => api.get('/focus'),
+  saveSession: (data) => api.post('/focus', data),
+};
+
+export const taskAPI = {
+  getTasks:     ()     => api.get('/tasks'),
+  createTask:   (data) => api.post('/tasks', data),
+  updateTask:   (id, data) => api.patch(`/tasks/${id}`, data),
+  deleteTask:   (id)   => api.delete(`/tasks/${id}`),
 };
 
 export const userAPI = {

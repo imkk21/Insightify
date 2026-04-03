@@ -4,7 +4,7 @@ import { userAPI } from '../services/api';
 import { PageHeader, Card, CardHeader, CardBody, ErrorMsg } from '../components/UI';
 
 export default function SettingsPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, refreshProfile } = useAuth();
   const [form,    setForm]    = useState({ city: '', displayName: '' });
   const [saving,  setSaving]  = useState(false);
   const [saved,   setSaved]   = useState(false);
@@ -21,6 +21,7 @@ export default function SettingsPage() {
     setSaving(true); setError(''); setSaved(false);
     try {
       await userAPI.updateProfile(form);
+      if (refreshProfile) await refreshProfile();
       setSaved(true); setTimeout(() => setSaved(false), 3000);
     } catch (e) { setError(e.response?.data?.error || e.message); }
     finally { setSaving(false); }
@@ -69,7 +70,7 @@ export default function SettingsPage() {
                 <div className="text-xs text-ink3 font-mono mt-0.5">
                   {profile?.githubConnected
                     ? <span className="text-teal2">✓ GitHub: @{profile.githubUsername}</span>
-                    : <span className="text-ink3/60">GitHub not connected</span>}
+                    : <span className="text-ink3 opacity-60">GitHub not connected</span>}
                 </div>
               </div>
             </div>

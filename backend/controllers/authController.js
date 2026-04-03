@@ -15,8 +15,8 @@ const loginOrRegister = async (req, res) => {
       console.log(`New user created: ${email}`);
     } else {
       user.lastLogin = new Date();
-      if (displayName) user.displayName = displayName;
-      if (photoURL)    user.photoURL    = photoURL;
+      if (!user.displayName && displayName) user.displayName = displayName;
+      if (!user.photoURL && photoURL)    user.photoURL    = photoURL;
       await user.save();
     }
 

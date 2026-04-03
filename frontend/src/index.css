@@ -3,66 +3,90 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: #fdfcf9;
+    --foreground: #1a1714;
+    --card: rgba(255, 255, 255, 0.75);
+    --card-foreground: #1a1714;
+    --border: rgba(0, 0, 0, 0.08);
+    --ink: #1a1714;
+    --ink2: #4a453e;
+    --ink3: #756f67;
+    --accent1: rgba(232, 160, 48, 0.1);
+    --accent2: rgba(20, 184, 166, 0.1);
+  }
+
+  .dark {
+    --background: #0a0908;
+    --foreground: #f4ece6;
+    --card: rgba(20, 18, 16, 0.6);
+    --card-foreground: #f4ece6;
+    --border: rgba(255, 255, 255, 0.12);
+    --ink: #f4ece6;
+    --ink2: #cbbab0;
+    --ink3: #94867c;
+    --accent1: rgba(232, 160, 48, 0.15);
+    --accent2: rgba(20, 184, 166, 0.15);
+  }
+
   html { scroll-behavior: smooth; }
 
   body {
-    @apply bg-cream text-ink font-dm;
+    @apply bg-background text-foreground font-dm transition-colors duration-500 ease-in-out;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* Grain overlay */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.025'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.02'/%3E%3C/svg%3E");
   }
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-2xl border border-black/[0.07] shadow-sm;
+    @apply bg-card text-cardForeground border border-border shadow-[0_8px_32px_rgba(0,0,0,0.02)] backdrop-blur-3xl rounded-[1.5rem] transition-all duration-500 ease-out;
   }
 
   .btn-primary {
-    @apply bg-ink text-white rounded-xl px-5 py-2.5 text-sm font-semibold
-           transition-all duration-200 hover:bg-ink2 hover:-translate-y-0.5
-           disabled:opacity-50 disabled:cursor-not-allowed disabled:translate-y-0
-           font-syne;
+    @apply bg-foreground text-background rounded-2xl px-10 py-4 text-sm font-black
+           transition-all duration-500 hover:scale-[1.02] active:scale-95
+           disabled:opacity-50 disabled:cursor-not-allowed
+           font-syne shadow-[0_20px_40px_rgba(0,0,0,0.1)] uppercase tracking-[2px];
   }
 
   .btn-outline {
-    @apply bg-white text-ink border border-black/10 rounded-xl px-4 py-2
-           text-sm font-medium transition-all duration-200
-           hover:border-amber hover:text-amber;
+    @apply bg-transparent text-foreground border border-border rounded-2xl px-8 py-3
+           text-[11px] font-mono font-bold uppercase tracking-[2px] transition-all duration-500
+           hover:border-amber hover:text-amber backdrop-blur-md;
   }
 
   .input {
-    @apply w-full bg-cream border border-black/10 rounded-xl px-4 py-3
-           text-sm text-ink outline-none transition-all duration-200
-           focus:border-amber placeholder:text-ink3 font-dm;
+    background-color: transparent;
+    @apply w-full border border-border rounded-3xl px-6 py-5
+           text-sm text-foreground outline-none transition-all duration-500
+           focus:border-amber focus:ring-8 focus:ring-amber opacity-50 placeholder:text-ink3 font-dm backdrop-blur-xl shadow-inner;
   }
 
   .stat-card {
-    @apply card p-6 transition-all duration-200 hover:-translate-y-1
-           hover:shadow-md relative overflow-hidden;
+    @apply card p-8 transition-all duration-500 hover:-translate-y-2
+           hover:shadow-[0_40px_80px_rgba(0,0,0,0.1)] relative overflow-hidden;
   }
 
   .nav-item {
-    @apply flex items-center gap-3 px-3.5 py-2.5 rounded-xl cursor-pointer
-           transition-all duration-200 text-white/55 text-sm font-normal
-           hover:bg-white/[0.07] hover:text-white no-underline;
+    @apply flex items-center gap-4 px-6 py-4 rounded-xl text-sm font-bold text-ink2 transition-all duration-300 hover:bg-black/5 dark:hover:bg-white/5 hover:text-foreground no-underline;
   }
 
   .nav-item.active {
-    @apply bg-amber text-ink font-semibold;
+    @apply bg-amber text-[#1a1714] shadow-lg shadow-amber/20;
   }
 
   .badge {
-    @apply px-2.5 py-1 rounded-full text-[10px] font-mono border;
+    @apply px-4 py-1.5 rounded-full text-[10px] font-mono font-black border backdrop-blur-md uppercase tracking-widest;
   }
 }
 
@@ -71,7 +95,7 @@
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(26,23,20,0.12); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink3); }

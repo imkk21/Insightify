@@ -204,3 +204,81 @@ export const useInsight = () => {
 
   return { latest, history, loading, error, generating, generate, askCustom, refetch: fetchLatest };
 };
+
+// ── Focus & Deep Work ───────────────────────────────────────────────
+export const useFocus = () => {
+  const [data,    setData]    = useState({ sessions: [], weeklyMinutes: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(null);
+
+  const fetch = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const res = await focusAPI.getSessions();
+      setData(res.data);
+    } catch (e) {
+      setError(e.response?.data?.error || e.message);
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+
+  const save = async (sessionData) => {
+    try {
+      const { data: newSession } = await focusAPI.saveSession(sessionData);
+      setData(prev => ({
+        sessions: [newSession, ...prev.sessions],
+        weeklyMinutes: prev.weeklyMinutes + newSession.durationMinutes
+      }));
+      return newSession;
+    } catch (e) {
+      throw new Error(e.response?.data?.error || e.message);
+    }
+  };
+
+  return { data, loading, error, refetch: fetch, save };
+};
+
+// ── Tasks & Kanban ──────────────────────────────────────────────────
+export const useTasks = () => {
+  const [tasks,   setTasks]   = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error,   setError]   = useState(null);
+
+  const fetch = useCallback(async () => {
+    setLoading(true); setError(null);
+    try {
+      const res = await taskAPI.getTasks();
+      setTasks(res.data);
+    } catch (e) {
+      setError(e.response?.data?.error || e.message);
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+
+  const create = async (taskData) => {
+    try {
+      const { data: newTask } = await taskAPI.createTask(taskData);
+      setTasks(prev => [newTask, ...prev]);
+      return newTask;
+    } catch (e) { throw new Error(e.response?.data?.error || e.message); }
+  };
+
+  const update = async (id, taskData) => {
+    try {
+      const { data: updatedTask } = await taskAPI.updateTask(id, taskData);
+      setTasks(prev => prev.map(t => t._id === id ? updatedTask : t));
+      return updatedTask;
+    } catch (e) { throw new Error(e.response?.data?.error || e.message); }
+  };
+
+  const remove = async (id) => {
+    try {
+      await taskAPI.deleteTask(id);
+      setTasks(prev => prev.filter(t => t._id !== id));
+    } catch (e) { throw new Error(e.response?.data?.error || e.message); }
+  };
+
+  return { tasks, loading, error, refetch: fetch, create, update, remove };
+};

@@ -8,7 +8,7 @@ export default function InsightBanner({ insight, onGenerate, generating }) {
   };
 
   return (
-    <div className="bg-ink rounded-2xl p-7 relative overflow-hidden animate-slide-in">
+    <div className="bg-[#1a1714] rounded-3xl p-9 relative overflow-hidden animate-slide-in shadow-2xl border border-white/5">
       <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-amber/10 blur-xl pointer-events-none" />
       <div className="absolute bottom-0 left-1/3 w-36 h-36 rounded-full bg-teal2/10 blur-xl pointer-events-none" />
 

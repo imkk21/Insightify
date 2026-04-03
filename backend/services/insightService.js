@@ -4,8 +4,8 @@ const getModel = () => {
   const key = process.env.GEMINI_API_KEY;
   if (!key || key === 'your_gemini_api_key') return null;
   const genAI = new GoogleGenerativeAI(key);
-  // Try gemini-1.5-flash first (free tier), fallback to gemini-pro
-  return genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  // Using gemini-2.0-flash based on API availability (June 2025 stable release)
+  return genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
 };
 
 const buildPrompt = ({ github, weather, news, customPrompt }) => {

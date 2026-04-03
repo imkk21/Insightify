@@ -92,4 +92,36 @@ const generateCustomInsight = async (req, res) => {
   }
 };
 
-module.exports = { getLatestInsight, getInsightHistory, generateNewInsight, generateCustomInsight };
+/** POST /api/insight/refactor */
+const generateCodeRefactor = async (req, res) => {
+  try {
+    const { code, language } = req.body;
+    if (!code) return res.status(400).json({ error: 'Code snippet is required' });
+
+    const model = require('../services/insightService').getModel();
+    if (!model) return res.status(500).json({ error: 'AI model not configured' });
+
+    const prompt = `You are an expert senior software engineer. Optimize, refactor, and explain the following ${language || ''} code snippet. 
+    Focus on readability, performance, and modern best practices.
+    
+    Code to refactor:
+    \`\`\`${language || ''}
+    ${code}
+    \`\`\`
+    
+    Return your response in markdown format with:
+    1. A "Refactored Code" section with the code block.
+    2. A "Key Improvements" section with bullet points.
+    3. A "Complexity Analysis" section.`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+
+    res.json({ content: text.trim() });
+  } catch (err) {
+    console.error('generateCodeRefactor error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+module.exports = { getLatestInsight, getInsightHistory, generateNewInsight, generateCustomInsight, generateCodeRefactor };

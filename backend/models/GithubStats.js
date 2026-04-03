@@ -22,6 +22,7 @@ const githubStatsSchema = new mongoose.Schema(
       },
     ],
     weeklyCommits:  { type: Number, default: 0 },
+    productivityScore: { type: Number, default: 0 },
     recentCommits: [
       {
         repo:    String,

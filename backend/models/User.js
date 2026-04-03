@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema(
     city:            { type: String, default: '' },
     lat:             { type: Number, default: null },
     lon:             { type: Number, default: null },
+    // Spotify Integration
+    spotifyAccessToken:  { type: String, default: '' },
+    spotifyRefreshToken: { type: String, default: '' },
+    spotifyTokenExpiry:   { type: Date,   default: null },
     lastLogin:       { type: Date, default: Date.now },
   },
   { timestamps: true }

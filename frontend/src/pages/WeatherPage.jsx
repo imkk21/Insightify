@@ -47,7 +47,7 @@ export default function WeatherPage() {
                   <div className="text-sm text-ink2 capitalize mt-2">{c.description}</div>
                   <div className="text-xs text-ink3 mt-1">Feels like {c.feelsLike}°C</div>
                   {data.lat && (
-                    <div className="text-[10px] font-mono text-ink3/60 mt-2">
+                    <div className="text-[10px] font-mono text-ink3 opacity-60 mt-2">
                       📍 {data.lat?.toFixed(2)}, {data.lon?.toFixed(2)}
                     </div>
                   )}

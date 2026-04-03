@@ -37,7 +37,7 @@ export default function NewsCard({ article, compact = false }) {
         <img
           src={article.urlToImage}
           alt={article.title}
-          className="w-full h-36 object-cover rounded-xl mb-4"
+          className="w-full h-36 object-cover rounded-2xl mb-4"
           onError={(e) => { e.target.style.display = 'none'; }}
         />
       )}
