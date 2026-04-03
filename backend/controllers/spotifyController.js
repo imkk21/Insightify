@@ -97,6 +97,7 @@ exports.getPlaylists = async (req, res) => {
 
     res.json(playlistsRes.data.items);
   } catch (error) {
+    console.error('Fetch playlists error detail:', error.response?.data || error.message);
     res.status(error.response?.status || 500).json({ error: 'Failed to fetch playlists' });
   }
 };

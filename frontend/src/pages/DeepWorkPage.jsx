@@ -93,7 +93,19 @@ export default function DeepWorkPage() {
             ) : loadingPlaylists ? (
               <div className="flex items-center justify-center py-20"><DotLoader /></div>
             ) : playlists.length === 0 ? (
-              <EmptyState emoji="🎵" title="No Playlists Found" subtitle="Create some playlists in your Spotify account first." />
+              <EmptyState 
+                emoji="🎵" 
+                title="No Playlists Found" 
+                subtitle={
+                  <div className="space-y-4">
+                    <p>Make sure your account has public or private playlists. </p>
+                    <div className="p-4 bg-amber/5 border border-amber/20 rounded-2xl text-[11px] font-mono leading-relaxed mt-4">
+                      <span className="text-amber font-bold">🛠️ DEVELOPER TIP:</span><br/>
+                      If this is an "Other User" account, you MUST add their email to the <b>"Users and Permissions"</b> tab in your Spotify Developer Dashboard first!
+                    </div>
+                  </div>
+                } 
+              />
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Playlist Selection List */}
