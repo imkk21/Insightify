@@ -30,6 +30,11 @@
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
+  /* Keep brand font for logo */
+  .font-syne {
+    font-family: 'Syne', sans-serif;
+  }
+
   body {
     @apply bg-background text-foreground transition-colors duration-500 ease-in-out;
     -webkit-font-smoothing: antialiased;
