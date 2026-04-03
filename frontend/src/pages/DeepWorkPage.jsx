@@ -22,6 +22,15 @@ export default function DeepWorkPage() {
     } catch (err) { alert('Failed to initiate Spotify connection.'); }
   };
 
+  const handleDisconnect = async () => {
+    if (!window.confirm('Disconnect your Spotify account? This will stop neural synchronization.')) return;
+    try {
+      await spotifyAPI.disconnect();
+      setSelectedPlaylist(null);
+      await checkSpotifyStatus();
+    } catch (err) { alert('Failed to disconnect Spotify.'); }
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
       <PageHeader title="Sonic Flow" subtitle="Sync your neural rhythm with your Spotify library." />
@@ -33,8 +42,21 @@ export default function DeepWorkPage() {
           <CardHeader 
             title="Focus Architecture" 
             subtitle={spotifyConnected ? "Select a playlist to initialize your sonic environment" : "Connect your Spotify core"} 
-            badge={spotifyConnected ? "V2 LINKED" : "OFFLINE"}
-            badgeStyle={spotifyConnected ? "bg-teal2/10 text-teal2 border-teal2/20" : "bg-rose/10 text-rose border-rose/20"}
+            badge={
+              <div className="flex items-center gap-2">
+                <span className={`px-3 py-1 rounded-full text-[10px] font-mono border ${spotifyConnected ? 'bg-teal2/10 text-teal2 border-teal2/20' : 'bg-rose/10 text-rose border-rose/20'}`}>
+                  {spotifyConnected ? "V2 LINKED" : "OFFLINE"}
+                </span>
+                {spotifyConnected && (
+                  <button 
+                    onClick={handleDisconnect}
+                    className="p-1 px-2 text-[10px] bg-rose/5 text-rose border border-rose/20 rounded-full hover:bg-rose hover:text-white transition-all font-mono"
+                  >
+                    DISCONNECT
+                  </button>
+                )}
+              </div>
+            }
           />
           
           <CardBody className="flex-1 overflow-y-auto max-h-[700px] scrollbar-hide py-6">

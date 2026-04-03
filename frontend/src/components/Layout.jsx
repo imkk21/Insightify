@@ -89,8 +89,7 @@ export default function Layout() {
               {profile?.photoURL ? <img src={profile.photoURL} alt="" /> : initials}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-foreground truncate tracking-tight">{profile?.displayName || 'User Core'}</div>
-              <div className="text-[10px] text-ink3/60 truncate font-mono uppercase tracking-wider">Lvl 4 Dev.</div>
+              <div className="text-sm font-bold text-foreground truncate tracking-tight">{profile?.displayName || 'Neural Node'}</div>
             </div>
             <button onClick={toggleTheme} className="p-2.5 rounded-2xl bg-background border border-border text-foreground hover:border-amber transition-all active:scale-95">
               {theme === 'dark' ? <Sun size={15} className="text-amber" /> : <Moon size={15} className="text-indigo" />}

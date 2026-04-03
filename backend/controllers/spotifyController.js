@@ -15,7 +15,8 @@ exports.getAuthUrl = (req, res) => {
     client_id: CLIENT_ID,
     scope: scope,
     redirect_uri: REDIRECT_URI,
-    state: req.user.uid
+    state: req.user.uid,
+    show_dialog: true
   });
 
   const url = `https://accounts.spotify.com/authorize?${params.toString()}`;
@@ -103,4 +104,21 @@ exports.getPlaylists = async (req, res) => {
 exports.getConnectionStatus = async (req, res) => {
   const user = await User.findOne({ uid: req.user.uid });
   res.json({ connected: !!user?.spotifyAccessToken });
+};
+
+exports.disconnectSpotify = async (req, res) => {
+  try {
+    const uid = req.user.uid;
+    await User.findOneAndUpdate(
+      { uid },
+      { 
+        spotifyAccessToken: '', 
+        spotifyRefreshToken: '', 
+        spotifyTokenExpiry: null 
+      }
+    );
+    res.json({ message: 'Spotify disconnected successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 };

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useMusic } from '../context/MusicContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, GripHorizontal, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
+import { X, GripHorizontal, Maximize2, Minimize2, ExternalLink, RotateCcw } from 'lucide-react';
 
 export default function MusicFloatingPlayer() {
   const { selectedPlaylist, setSelectedPlaylist } = useMusic();
@@ -48,6 +48,16 @@ export default function MusicFloatingPlayer() {
           </div>
           
           <div className="flex items-center gap-1.5 pl-2">
+            <button 
+              onClick={() => {
+                localStorage.removeItem('music-pos');
+                window.location.reload();
+              }} 
+              title="Reset Position"
+              className="p-1.5 rounded-lg hover:bg-white/10 text-ink3 transition-all"
+            >
+              <RotateCcw size={12} />
+            </button>
             <button onClick={() => setIsMinimized(!isMinimized)} className="p-1.5 rounded-lg hover:bg-white/10 text-ink3 transition-all">
               {isMinimized ? <Maximize2 size={12} /> : <Minimize2 size={12} />}
             </button>

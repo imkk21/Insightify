@@ -59,6 +59,7 @@ export const spotifyAPI = {
   getLoginUrl: () => api.get('/spotify/login'),
   getStatus:   () => api.get('/spotify/status'),
   getPlaylists: () => api.get('/spotify/playlists'),
+  disconnect: () => api.delete('/spotify/disconnect'),
 };
 
 export const focusAPI = {

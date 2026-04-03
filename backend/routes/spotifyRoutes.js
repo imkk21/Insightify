@@ -12,5 +12,6 @@ router.get('/callback', spotifyController.callback);
 // Secure endpoints
 router.get('/status', verifyToken, spotifyController.getConnectionStatus);
 router.get('/playlists', verifyToken, spotifyController.getPlaylists);
+router.delete('/disconnect', verifyToken, spotifyController.disconnectSpotify);
 
 module.exports = router;
