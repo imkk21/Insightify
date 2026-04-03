@@ -8,7 +8,7 @@ export default function MusicFloatingPlayer() {
   const [isMinimized, setIsMinimized] = useState(false);
   
   // Persistent Position & Size
-  const lastPos = JSON.parse(localStorage.getItem('music-pos') || '{"x": 20, "y": 600}');
+  const lastPos = JSON.parse(localStorage.getItem('music-pos') || '{"x": 20, "y": 80}');
   const lastSize = JSON.parse(localStorage.getItem('music-size') || '{"w": 320, "h": 152}');
   
   const [size, setSize] = useState(lastSize);
@@ -18,20 +18,36 @@ export default function MusicFloatingPlayer() {
     if (!isMinimized) localStorage.setItem('music-size', JSON.stringify(size));
   }, [size, isMinimized]);
 
+  // Viewport Boundary Safety Check
+  const [safePos, setSafePos] = useState(lastPos);
+  useEffect(() => {
+    const checkVisibility = () => {
+      const maxX = window.innerWidth - 320;
+      const maxY = window.innerHeight - 100;
+      if (lastPos.x > maxX || lastPos.y > maxY || lastPos.x < 0 || lastPos.y < 0) {
+        setSafePos({ x: 20, y: 80 });
+      }
+    };
+    checkVisibility();
+    window.addEventListener('resize', checkVisibility);
+    return () => window.removeEventListener('resize', checkVisibility);
+  }, [lastPos.x, lastPos.y]);
+
   if (!selectedPlaylist) return null;
 
   return (
     <AnimatePresence>
       <motion.div
         drag
+        dragConstraints={{ left: 0, right: window.innerWidth - 300, top: 0, bottom: window.innerHeight - 100 }}
         dragElastic={0.1}
         dragMomentum={false}
-        initial={{ opacity: 0, scale: 0.9, x: lastPos.x, y: lastPos.y }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.9, x: safePos.x, y: safePos.y }}
+        animate={{ opacity: 1, scale: 1, x: safePos.x, y: safePos.y }}
         onDragEnd={(e, info) => {
           localStorage.setItem('music-pos', JSON.stringify({ x: info.point.x - 160, y: info.point.y - 40 }));
         }}
-        className="fixed z-[9999] group shadow-[0_32px_64px_rgba(0,0,0,0.3)] backdrop-blur-3xl border border-border/50 rounded-3xl overflow-hidden bg-card/60"
+        className="fixed z-[9999999] group shadow-[0_32px_64px_rgba(0,0,0,0.3)] backdrop-blur-3xl border border-border/50 rounded-3xl overflow-hidden bg-card/60"
         style={{ 
           width: isMinimized ? '180px' : 'min(90vw, 320px)', 
           height: isMinimized ? '44px' : 'auto', 

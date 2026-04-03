@@ -31,9 +31,14 @@ export default function DeepWorkPage() {
     } catch (err) { alert('Failed to disconnect Spotify.'); }
   };
 
+  const handleResetPlayer = () => {
+    localStorage.removeItem('music-pos');
+    window.location.reload();
+  };
+
   return (
     <div className="max-w-6xl mx-auto">
-      <PageHeader title="Sonic Flow" subtitle="Sync your neural rhythm with your Spotify library." />
+      <PageHeader title="Music" subtitle="Sync your neural rhythm with your Spotify library." />
       
       <div className="grid grid-cols-1 gap-8 items-start">
         
@@ -48,12 +53,20 @@ export default function DeepWorkPage() {
                   {spotifyConnected ? "V2 LINKED" : "OFFLINE"}
                 </span>
                 {spotifyConnected && (
-                  <button 
-                    onClick={handleDisconnect}
-                    className="p-1 px-2 text-[10px] bg-rose/5 text-rose border border-rose/20 rounded-full hover:bg-rose hover:text-white transition-all font-mono"
-                  >
-                    DISCONNECT
-                  </button>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={handleResetPlayer}
+                      className="p-1 px-3 text-[10px] bg-amber/5 text-amber border border-amber/20 rounded-full hover:bg-amber hover:text-black transition-all font-mono"
+                    >
+                      BRING PLAYER HOME
+                    </button>
+                    <button 
+                      onClick={handleDisconnect}
+                      className="p-1 px-3 text-[10px] bg-rose/5 text-rose border border-rose/20 rounded-full hover:bg-rose hover:text-white transition-all font-mono"
+                    >
+                      DISCONNECT
+                    </button>
+                  </div>
                 )}
               </div>
             }
