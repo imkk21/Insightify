@@ -35,9 +35,8 @@ export default function MusicFloatingPlayer() {
         style={{ 
           width: isMinimized ? '180px' : 'min(90vw, 320px)', 
           height: isMinimized ? '44px' : 'auto', 
-          left: '50%',
-          transform: 'translateX(-50%)',
-          top: '80px',
+          left: 0,
+          top: 0,
           scale: typeof window !== 'undefined' && window.innerWidth < 640 ? 0.85 : 1
         }}
       >
