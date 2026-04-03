@@ -11,29 +11,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let redirectCheckDone = false;
-
-    // 1. Handle redirect result first
-    getRedirectResult(auth)
-      .then(async (result) => {
-        if (result?.user) {
-          try {
-            const { data } = await authAPI.login();
-            setProfile(data.user);
-          } catch (e) {
-            console.error('Auth sync failed from redirect:', e.message);
-          }
-        }
-        redirectCheckDone = true;
-      })
-      .catch((err) => {
-        console.error('Redirect result error:', err);
-        redirectCheckDone = true;
-      });
-
-    // 2. Listen for auth changes
+    // Single source of truth for auth state
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-      // Keep loading until redirect check is also processed
       setUser(firebaseUser);
       if (firebaseUser) {
         try {
@@ -45,26 +24,22 @@ export const AuthProvider = ({ children }) => {
       } else {
         setProfile(null);
       }
-      
-      // Safety delay to ensure redirect result had time to process if applicable
-      setTimeout(() => {
-        setLoading(false);
-      }, redirectCheckDone ? 0 : 500);
+      // Only release loading when initial auth check is definitely complete
+      setLoading(false);
     });
 
     return unsub;
   }, []);
 
   const loginWithGoogle = async () => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    if (isMobile) {
-       // On mobile, popups are often blocked, redirect is safer
-       return await signInWithRedirect(auth, googleProvider);
-    } else {
-       // On desktop, popups are a better UX
-       const result = await signInWithPopup(auth, googleProvider);
-       return result;
+    try {
+      // Use Popup for all platforms – avoids Missing Initial State errors on Vercel/Firebase
+      return await signInWithPopup(auth, googleProvider);
+    } catch (err) {
+      if (err.code === 'auth/popup-blocked') {
+        alert('Login popup was blocked. Please enable popups for this site or open directly in your browser (not inside Instagram/GitHub).');
+      }
+      throw err;
     }
   };
 
