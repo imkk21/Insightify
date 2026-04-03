@@ -9,7 +9,7 @@ export const Skeleton = ({ className = '' }) => (
 export const PageHeader = ({ title, subtitle, children }) => (
   <div className="flex flex-col md:flex-row items-baseline md:items-start justify-between gap-6 mb-12">
     <div>
-      <h1 className="font-syne font-black text-4xl lg:text-5xl text-foreground tracking-tighter leading-none">
+      <h1 className="font-syne font-black text-3xl sm:text-4xl lg:text-5xl text-foreground tracking-tighter leading-tight">
         {title}
       </h1>
       {subtitle && (
@@ -63,7 +63,7 @@ export const StatCard = ({ icon, value, label, change, changeUp = true, accentCo
     >
       <span style={{ color: accentColor }}>{icon}</span>
     </div>
-    <div className="font-syne font-black text-4xl text-foreground leading-none tracking-tighter">
+    <div className="font-syne font-black text-3xl sm:text-4xl text-foreground leading-none tracking-tighter">
       {value ?? '—'}
     </div>
     <div className="text-[11px] font-mono uppercase tracking-widest text-ink3/60 mt-3">{label}</div>

@@ -32,7 +32,14 @@ export default function MusicFloatingPlayer() {
           localStorage.setItem('music-pos', JSON.stringify({ x: info.point.x - 160, y: info.point.y - 40 }));
         }}
         className="fixed z-[9999] group shadow-[0_32px_64px_rgba(0,0,0,0.3)] backdrop-blur-3xl border border-border/50 rounded-3xl overflow-hidden bg-card/60"
-        style={{ width: isMinimized ? '200px' : size.w, height: isMinimized ? '44px' : 'auto', left: 0, top: 0 }}
+        style={{ 
+          width: isMinimized ? '180px' : 'min(90vw, 320px)', 
+          height: isMinimized ? '44px' : 'auto', 
+          left: '50%',
+          transform: 'translateX(-50%)',
+          top: '80px',
+          scale: typeof window !== 'undefined' && window.innerWidth < 640 ? 0.85 : 1
+        }}
       >
         {/* Neural Drag Handle */}
         <div className="h-10 bg-foreground/5 dark:bg-white/5 border-b border-border/30 flex items-center justify-between px-4 cursor-grab active:cursor-grabbing group-hover:bg-foreground/10 transition-colors">

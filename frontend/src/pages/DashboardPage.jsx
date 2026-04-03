@@ -187,12 +187,12 @@ export default function DashboardPage() {
             <CardHeader title="Atmospheric Data" subtitle={weather.data ? `${weather.data.city}` : 'Geo-Scan...'} badge="LIVE" badgeStyle="bg-amber/10 text-amber border-amber/20" />
             <CardBody className="py-8">
               {weather.loading || weather.locating ? <DotLoader /> : c ? (
-                <div className="flex items-center gap-12">
-                  <div className="relative">
+                <div className="flex flex-col sm:flex-row items-center gap-8 sm:gap-12">
+                  <div className="relative shrink-0">
                      <div className="absolute inset-0 bg-amber/20 blur-[30px] rounded-full" />
                      {c.icon && <img src={`https://openweathermap.org/img/wn/${c.icon}@4x.png`} alt="" className="w-24 h-24 relative z-10 drop-shadow-2xl group-hover:scale-110 transition-transform duration-700" />}
                   </div>
-                  <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-8">
+                  <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 w-full text-center sm:text-left">
                     <div>
                       <div className="font-syne font-black text-6xl text-foreground tracking-tighter">{Math.round(c.temp)}°</div>
                       <div className="text-sm font-bold text-ink2 capitalize italic opacity-80">{c.description}</div>

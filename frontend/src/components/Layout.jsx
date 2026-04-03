@@ -23,8 +23,7 @@ export default function Layout() {
   const { user, profile, logout } = useAuth();
   const { selectedPlaylist, setSelectedPlaylist } = useMusic();
   const navigate = useNavigate();
-
-  // Theme logic
+  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
@@ -37,8 +36,24 @@ export default function Layout() {
     .split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground transition-colors duration-500 overflow-hidden">
-      <aside className="fixed left-0 top-0 bottom-0 w-[280px] border-r border-border bg-card backdrop-blur-3xl flex flex-col z-50 transition-all duration-500">
+    <div className="flex min-h-screen bg-background text-foreground transition-colors duration-500 overflow-x-hidden">
+      {/* Mobile Top Bar */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 border-b border-border bg-card/80 backdrop-blur-3xl z-[100] flex items-center justify-between px-6">
+        <div className="font-syne font-black text-lg text-foreground tracking-tight flex items-center gap-2">
+          <div className="w-6 h-6 bg-amber rounded flex items-center justify-center text-[#1a1714] text-xs">I</div>
+          Insightify
+        </div>
+        <button 
+          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
+          className="p-2 rounded-xl bg-foreground/5 text-foreground hover:bg-foreground/10 transition-all shadow-inner border border-border"
+        >
+          {isMobileMenuOpen ? <X size={20} /> : <div className="space-y-1"><div className="w-5 h-0.5 bg-foreground" /><div className="w-5 h-0.5 bg-foreground" /><div className="w-5 h-0.5 bg-foreground" /></div>}
+        </button>
+      </header>
+
+      {/* Sidebar - Desktop & Mobile Drawer */}
+      <aside className={`fixed left-0 top-0 bottom-0 w-[280px] border-r border-border bg-card backdrop-blur-3xl flex flex-col z-[110] transition-transform duration-500 lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+
         
         {/* Logo */}
         <div className="px-8 py-10 border-b border-border">
@@ -91,7 +106,20 @@ export default function Layout() {
         </div>
       </aside>
 
-      <main className="ml-[280px] flex-1 relative z-10 min-h-screen p-8 lg:p-14 overflow-y-auto overflow-x-hidden transition-all duration-500 bg-background/50">
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMobileMenuOpen(false)}
+            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[105]"
+          />
+        )}
+      </AnimatePresence>
+
+      <main className="flex-1 lg:ml-[280px] relative z-10 min-h-screen p-5 md:p-8 lg:p-14 overflow-y-auto overflow-x-hidden transition-all duration-500 bg-background/50 pt-24 lg:pt-14">
         <div className="max-w-[1600px] mx-auto relative">
           <Outlet />
         </div>

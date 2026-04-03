@@ -28,7 +28,7 @@ export default function WeatherPage() {
       )}
       {error && <div className="mb-5"><ErrorMsg message={error} /></div>}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-7">
         <StatCard icon="🌡️" value={c ? `${c.temp}°C`       : '—'} label="Temperature"  accentColor="#e8a030" delay={0}   />
         <StatCard icon="💧" value={c ? `${c.humidity}%`    : '—'} label="Humidity"     accentColor="#14b8a6" delay={80}  />
         <StatCard icon="💨" value={c ? `${c.windSpeed} km/h`: '—'} label="Wind Speed"   accentColor="#e05a6a" delay={160} />
