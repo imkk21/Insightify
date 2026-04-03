@@ -28,9 +28,9 @@ const generateNewInsight = async (req, res) => {
   try {
     const uid = req.user.uid;
     const [github, weather, news] = await Promise.all([
-      GithubStats.findOne({ uid }),
-      Weather.findOne({ uid }),
-      News.findOne({ uid }),
+      GithubStats.findOne({ uid }).then(doc => doc?.toObject() || null),
+      Weather.findOne({ uid }).then(doc => doc?.toObject() || null),
+      News.findOne({ uid }).then(doc => doc?.toObject() || null),
     ]);
 
     const result = await generateInsight({ github, weather, news });

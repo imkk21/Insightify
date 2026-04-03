@@ -11,7 +11,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Handle redirect result if user just returned from login screen
+    let redirectCheckDone = false;
+
+    // 1. Handle redirect result first
     getRedirectResult(auth)
       .then(async (result) => {
         if (result?.user) {
@@ -22,10 +24,16 @@ export const AuthProvider = ({ children }) => {
             console.error('Auth sync failed from redirect:', e.message);
           }
         }
+        redirectCheckDone = true;
       })
-      .catch((err) => console.error('Redirect result error:', err));
+      .catch((err) => {
+        console.error('Redirect result error:', err);
+        redirectCheckDone = true;
+      });
 
+    // 2. Listen for auth changes
     const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
+      // Keep loading until redirect check is also processed
       setUser(firebaseUser);
       if (firebaseUser) {
         try {
@@ -37,8 +45,13 @@ export const AuthProvider = ({ children }) => {
       } else {
         setProfile(null);
       }
-      setLoading(false);
+      
+      // Safety delay to ensure redirect result had time to process if applicable
+      setTimeout(() => {
+        setLoading(false);
+      }, redirectCheckDone ? 0 : 500);
     });
+
     return unsub;
   }, []);
 

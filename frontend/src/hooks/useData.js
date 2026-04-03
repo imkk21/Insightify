@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { githubAPI, weatherAPI, newsAPI, insightAPI } from '../services/api';
+import { githubAPI, weatherAPI, newsAPI, insightAPI, focusAPI, taskAPI } from '../services/api';
 
 // ── GitHub ─────────────────────────────────────────────────────────────
 export const useGithub = () => {

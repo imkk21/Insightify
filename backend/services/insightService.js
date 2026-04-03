@@ -76,7 +76,9 @@ const generateInsight = async ({ github, weather, news, customPrompt }) => {
 
   // Fallback template
   const lang = github?.languages
-    ? Object.entries(github.languages).sort((a,b)=>b[1]-a[1])[0]?.[0] ?? 'JavaScript'
+    ? Object.entries(github.languages)
+        .filter(([key]) => !key.startsWith('$') && !key.startsWith('_'))
+        .sort((a,b)=>b[1]-a[1])[0]?.[0] ?? 'JavaScript'
     : 'JavaScript';
   const fallback = `You pushed ${github?.weeklyCommits ?? 0} commits this week across ${github?.totalRepos ?? 0} repositories, with ${lang} leading your stack. Working in ${weather?.current?.description ?? 'current conditions'} at ${weather?.current?.temp ?? '?'}°C in ${weather?.city ?? 'your city'} — ${(github?.weeklyCommits ?? 0) > 10 ? 'excellent momentum this week!' : 'every commit counts toward your goals.'} The tech world is buzzing with new developments — great time to stay current. Next week, aim to open at least one pull request on your top-starred repository to grow community traction.`;
 
