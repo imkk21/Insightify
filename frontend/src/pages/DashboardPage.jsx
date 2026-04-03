@@ -60,8 +60,8 @@ export default function DashboardPage() {
   const insight = useInsight();
   const focus   = useFocus();
   const taskData = useTasks();
-
-  const name = profile?.displayName || user?.displayName || 'Developer';
+111
+  const name = profile?.displayName || user?.displayName || user?.name || 'Developer';
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 

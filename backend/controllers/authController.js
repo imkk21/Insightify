@@ -7,16 +7,18 @@ const User = require('../models/User');
  */
 const loginOrRegister = async (req, res) => {
   try {
-    const { uid, email, displayName, photoURL } = req.user; // from verifyToken middleware
+    const { uid, email, photoURL, name, picture } = req.user; // from verifyToken middleware
+    const finalDisplayName = name || req.user.displayName || 'Developer';
+    const finalPhotoURL = picture || photoURL || '';
 
     let user = await User.findOne({ uid });
     if (!user) {
-      user = await User.create({ uid, email, displayName, photoURL });
+      user = await User.create({ uid, email, displayName: finalDisplayName, photoURL: finalPhotoURL });
       console.log(`New user created: ${email}`);
     } else {
       user.lastLogin = new Date();
-      if (!user.displayName && displayName) user.displayName = displayName;
-      if (!user.photoURL && photoURL)    user.photoURL    = photoURL;
+      if (!user.displayName && finalDisplayName) user.displayName = finalDisplayName;
+      if (!user.photoURL && finalPhotoURL)    user.photoURL    = finalPhotoURL;
       await user.save();
     }
 

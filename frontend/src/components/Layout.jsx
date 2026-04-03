@@ -32,7 +32,7 @@ export default function Layout() {
 
   const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
 
-  const initials = (profile?.displayName || user?.displayName || 'U')
+  const initials = (profile?.displayName || user?.displayName || user?.name || 'U')
     .split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
 
   return (
@@ -89,7 +89,7 @@ export default function Layout() {
               {profile?.photoURL ? <img src={profile.photoURL} alt="" /> : initials}
             </div>
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-foreground truncate tracking-tight">{profile?.displayName || 'Neural Node'}</div>
+              <div className="text-sm font-bold text-foreground truncate tracking-tight">{profile?.displayName || user?.displayName || user?.name || 'Member'}</div>
             </div>
             <button onClick={toggleTheme} className="p-2.5 rounded-2xl bg-background border border-border text-foreground hover:border-amber transition-all active:scale-95">
               {theme === 'dark' ? <Sun size={15} className="text-amber" /> : <Moon size={15} className="text-indigo" />}
