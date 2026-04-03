@@ -20,11 +20,11 @@ initFirebase();
 // Middleware
 // Always allow localhost:5173 for dev. FRONTEND_URL must be a valid URL,
 // not an API key — validate it defensively.
-const allowedOrigins = ['http://localhost:5173', 'http://localhost:5174'];
-const envOrigin = process.env.FRONTEND_URL;
-if (envOrigin && envOrigin.startsWith('http')) {
-  allowedOrigins.push(envOrigin);
-}
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'http://localhost:5174', 
+  'https://insightifyweb.vercel.app'
+];
 app.use(cors({
   origin: (origin, cb) => {
     // Allow no-origin requests (Postman, curl, same-origin)
