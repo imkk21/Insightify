@@ -12,11 +12,15 @@ export default function MusicFloatingPlayer() {
   const lastSize = JSON.parse(localStorage.getItem('music-size') || '{"w": 320, "h": 152}');
   
   const [size, setSize] = useState(lastSize);
+  const [hasMounted, setHasMounted] = useState(false);
   const containerRef = useRef(null);
 
   useEffect(() => {
+    setHasMounted(true);
     if (!isMinimized) localStorage.setItem('music-size', JSON.stringify(size));
   }, [size, isMinimized]);
+
+  if (!hasMounted || !selectedPlaylist) return null;
 
   // Viewport Boundary Safety Check
   const [safePos, setSafePos] = useState(lastPos);

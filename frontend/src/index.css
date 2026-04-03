@@ -12,8 +12,6 @@
     --ink: #1a1714;
     --ink2: #4a453e;
     --ink3: #756f67;
-    --accent1: rgba(232, 160, 48, 0.1);
-    --accent2: rgba(20, 184, 166, 0.1);
   }
 
   .dark {
@@ -25,14 +23,15 @@
     --ink: #f4ece6;
     --ink2: #cbbab0;
     --ink3: #94867c;
-    --accent1: rgba(232, 160, 48, 0.15);
-    --accent2: rgba(20, 184, 166, 0.15);
   }
 
-  html { scroll-behavior: smooth; }
+  html { 
+    scroll-behavior: smooth; 
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
 
   body {
-    @apply bg-background text-foreground font-dm transition-colors duration-500 ease-in-out;
+    @apply bg-background text-foreground transition-colors duration-500 ease-in-out;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -53,10 +52,10 @@
   }
 
   .btn-primary {
-    @apply bg-foreground text-background rounded-2xl px-10 py-4 text-sm font-black
+    @apply bg-foreground text-background rounded-2xl px-10 py-4 text-sm font-bold
            transition-all duration-500 hover:scale-[1.02] active:scale-95
            disabled:opacity-50 disabled:cursor-not-allowed
-           font-syne shadow-[0_20px_40px_rgba(0,0,0,0.1)] uppercase tracking-[2px];
+           shadow-[0_20px_40px_rgba(0,0,0,0.1)] uppercase tracking-[1px];
   }
 
   .btn-outline {
@@ -69,7 +68,7 @@
     background-color: transparent;
     @apply w-full border border-border rounded-3xl px-6 py-5
            text-sm text-foreground outline-none transition-all duration-500
-           focus:border-amber focus:ring-8 focus:ring-amber opacity-50 placeholder:text-ink3 font-dm backdrop-blur-xl shadow-inner;
+           focus:border-amber focus:ring-8 focus:ring-amber opacity-50 placeholder:text-ink3 backdrop-blur-xl shadow-inner;
   }
 
   .stat-card {
@@ -86,7 +85,7 @@
   }
 
   .badge {
-    @apply px-4 py-1.5 rounded-full text-[10px] font-mono font-black border backdrop-blur-md uppercase tracking-widest;
+    @apply px-4 py-1.5 rounded-full text-[10px] font-mono font-bold border backdrop-blur-md uppercase tracking-widest;
   }
 }
 

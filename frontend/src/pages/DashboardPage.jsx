@@ -40,7 +40,7 @@ const ProductivityGauge = ({ score }) => {
         <motion.span 
           initial={{ opacity: 0, scale: 0.5 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="font-syne font-black text-5xl text-foreground tracking-tighter"
+          className="font-bold text-5xl text-foreground tracking-tight"
         >
           {normalizedScore}
         </motion.span>
@@ -119,11 +119,11 @@ export default function DashboardPage() {
                   <div className="mt-8 grid grid-cols-1 gap-3 w-full">
                     <div className="flex justify-between items-center bg-background/40 backdrop-blur-xl rounded-2xl p-4 border border-border shadow-inner">
                       <div className="text-[10px] uppercase font-mono text-ink3 tracking-widest">Focus Yield</div>
-                      <div className="text-2xl font-black text-foreground tracking-tighter">{focusHours}h</div>
+                      <div className="text-2xl font-bold text-foreground tracking-tight">{focusHours}h</div>
                     </div>
                     <div className="flex justify-between items-center bg-background/40 backdrop-blur-xl rounded-2xl p-4 border border-border shadow-inner">
                       <div className="text-[10px] uppercase font-mono text-ink3 tracking-widest">Active Nodes</div>
-                      <div className="text-2xl font-black text-amber tracking-tighter">{pendingTasks}</div>
+                      <div className="text-2xl font-bold text-amber tracking-tight">{pendingTasks}</div>
                     </div>
                   </div>
                 </div>
@@ -194,7 +194,7 @@ export default function DashboardPage() {
                   </div>
                   <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 w-full text-center sm:text-left">
                     <div>
-                      <div className="font-syne font-black text-6xl text-foreground tracking-tighter">{Math.round(c.temp)}°</div>
+                      <div className="font-bold text-6xl text-foreground tracking-tight">{Math.round(c.temp)}°</div>
                       <div className="text-sm font-bold text-ink2 capitalize italic opacity-80">{c.description}</div>
                     </div>
                     <div className="flex flex-col justify-center">

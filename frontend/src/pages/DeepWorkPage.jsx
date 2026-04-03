@@ -78,13 +78,13 @@ export default function DeepWorkPage() {
                 <div className="w-24 h-24 bg-[#1DB954]/10 rounded-[2.5rem] flex items-center justify-center mb-8 border border-[#1DB954]/20 animate-pulse">
                   <Headphones size={48} className="text-[#1DB954]" />
                 </div>
-                <h3 className="text-3xl font-syne font-black text-foreground mb-4">Initialize Spotify</h3>
+                <h3 className="text-3xl font-bold text-foreground mb-4">Initialize Spotify</h3>
                 <p className="text-ink3 text-base leading-relaxed mb-12 max-w-[400px]">
                   Authorize Spotify to bridge your high-fidelity playlists directly into your Insightify workspace.
                 </p>
                 <button 
                   onClick={handleConnectSpotify}
-                  className="flex items-center gap-3 bg-[#1DB954] text-black px-12 py-5 rounded-[2rem] font-syne font-black hover:scale-105 transition-all shadow-2xl shadow-[#1DB954]/20"
+                  className="flex items-center gap-3 bg-[#1DB954] text-black px-12 py-5 rounded-[2rem] font-bold hover:scale-105 transition-all shadow-2xl shadow-[#1DB954]/20"
                 >
                   <ExternalLink size={20} />
                   Connect Spotify Core
@@ -136,7 +136,7 @@ export default function DeepWorkPage() {
                                 <img src={selectedPlaylist.images?.[0]?.url} className="w-20 h-20 rounded-2xl shadow-2xl" alt="" />
                                 <div>
                                    <div className="text-[10px] font-mono text-[#1db954] uppercase tracking-[3px] mb-1">Active Environment</div>
-                                   <div className="text-xl font-syne font-black text-foreground leading-tight">{selectedPlaylist.name}</div>
+                                   <div className="text-xl font-bold text-foreground leading-tight">{selectedPlaylist.name}</div>
                                 </div>
                               </div>
                               <div className="rounded-3xl p-8 bg-black/5 border border-dashed border-border flex flex-col items-center justify-center text-center">

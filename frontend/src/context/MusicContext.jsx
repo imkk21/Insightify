@@ -31,6 +31,11 @@ export const MusicProvider = ({ children }) => {
   useEffect(() => {
     if (user) {
       checkSpotifyStatus();
+      
+      // Eager fetch if we just came back from auth
+      if (window.location.search.includes('spotify=connected')) {
+        fetchPlaylists();
+      }
     }
   }, [user]);
 

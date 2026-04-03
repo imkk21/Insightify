@@ -9,7 +9,7 @@ export const Skeleton = ({ className = '' }) => (
 export const PageHeader = ({ title, subtitle, children }) => (
   <div className="flex flex-col md:flex-row items-baseline md:items-start justify-between gap-6 mb-12">
     <div>
-      <h1 className="font-syne font-black text-3xl sm:text-4xl lg:text-5xl text-foreground tracking-tighter leading-tight">
+      <h1 className="font-bold text-3xl sm:text-4xl lg:text-5xl text-foreground tracking-tight leading-tight">
         {title}
       </h1>
       {subtitle && (
@@ -33,7 +33,7 @@ export const Card = ({ children, className = '', onClick }) => (
 export const CardHeader = ({ title, subtitle, badge, badgeStyle }) => (
   <div className="flex items-start justify-between px-8 py-6 border-b border-border">
     <div>
-      <div className="font-syne font-black text-lg text-foreground tracking-tight">{title}</div>
+      <div className="font-bold text-lg text-foreground tracking-tight">{title}</div>
       {subtitle && <div className="text-[11px] text-ink3/60 font-mono uppercase tracking-widest mt-1.5">{subtitle}</div>}
     </div>
     {badge && (
@@ -63,7 +63,7 @@ export const StatCard = ({ icon, value, label, change, changeUp = true, accentCo
     >
       <span style={{ color: accentColor }}>{icon}</span>
     </div>
-    <div className="font-syne font-black text-3xl sm:text-4xl text-foreground leading-none tracking-tighter">
+    <div className="font-bold text-3xl sm:text-4xl text-foreground leading-none tracking-tight">
       {value ?? '—'}
     </div>
     <div className="text-[11px] font-mono uppercase tracking-widest text-ink3/60 mt-3">{label}</div>
@@ -131,7 +131,7 @@ export const ErrorMsg = ({ message }) => (
 export const EmptyState = ({ emoji = '🔍', title, subtitle }) => (
   <div className="text-center py-20 px-8 flex flex-col items-center">
     <div className="text-5xl mb-6 filter drop-shadow-2xl">{emoji}</div>
-    <div className="font-syne font-black text-foreground text-xl tracking-tight">{title}</div>
+    <div className="font-bold text-foreground text-xl tracking-tight">{title}</div>
     {subtitle && <div className="text-sm text-ink3/60 mt-3 font-medium max-w-[250px] leading-relaxed italic">{subtitle}</div>}
   </div>
 );

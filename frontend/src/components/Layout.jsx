@@ -39,8 +39,8 @@ export default function Layout() {
     <div className="flex min-h-screen bg-background text-foreground transition-colors duration-500 overflow-x-hidden">
       {/* Mobile Top Bar */}
       <header className="lg:hidden fixed top-0 left-0 right-0 h-16 border-b border-border bg-card/80 backdrop-blur-3xl z-[100] flex items-center justify-between px-6">
-        <div className="font-syne font-black text-lg text-foreground tracking-tight flex items-center gap-2">
-          <div className="w-6 h-6 bg-amber rounded flex items-center justify-center text-[#1a1714] text-xs">I</div>
+        <div className="font-bold text-lg text-foreground tracking-tight flex items-center gap-2">
+          <div className="w-6 h-6 bg-amber rounded flex items-center justify-center text-[#1a1714] text-xs font-bold">I</div>
           Insightify
         </div>
         <button 
@@ -57,7 +57,7 @@ export default function Layout() {
         
         {/* Logo */}
         <div className="px-8 py-10 border-b border-border">
-          <div className="font-syne font-black text-2xl text-foreground tracking-tight flex items-center gap-2">
+          <div className="font-bold text-2xl text-foreground tracking-tight flex items-center gap-2">
             <div className="w-8 h-8 bg-amber rounded-lg flex items-center justify-center text-[#1a1714] text-lg shadow-lg shadow-amber/20">I</div>
             Insightify<span className="text-amber">.</span>
           </div>
@@ -85,7 +85,7 @@ export default function Layout() {
         {/* Footer: User + Theme */}
         <div className="px-5 py-6 border-t border-border space-y-4 bg-background/50 backdrop-blur-md">
           <div className="flex items-center gap-3 bg-card p-3 rounded-3xl border border-border shadow-sm backdrop-blur-xl">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber via-rose to-teal2 flex items-center justify-center font-syne font-black text-sm text-white flex-shrink-0 overflow-hidden shadow-2xl ring-2 ring-white/10">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber via-rose to-teal2 flex items-center justify-center font-bold text-sm text-white flex-shrink-0 overflow-hidden shadow-2xl ring-2 ring-white/10">
               {profile?.photoURL ? <img src={profile.photoURL} alt="" /> : initials}
             </div>
             <div className="flex-1 min-w-0">
