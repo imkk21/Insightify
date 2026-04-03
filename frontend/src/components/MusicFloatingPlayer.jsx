@@ -6,38 +6,46 @@ import { X, GripHorizontal, Maximize2, Minimize2, ExternalLink, RotateCcw } from
 export default function MusicFloatingPlayer() {
   const { selectedPlaylist, setSelectedPlaylist } = useMusic();
   const [isMinimized, setIsMinimized] = useState(false);
-  
-  // Persistent Position & Size
-  const lastPos = JSON.parse(localStorage.getItem('music-pos') || '{"x": 20, "y": 80}');
-  const lastSize = JSON.parse(localStorage.getItem('music-size') || '{"w": 320, "h": 152}');
-  
-  const [size, setSize] = useState(lastSize);
+  const [size, setSize] = useState({ w: 320, h: 152 });
   const [hasMounted, setHasMounted] = useState(false);
   const containerRef = useRef(null);
 
+  // Viewport Boundary Safety state
+  const [safePos, setSafePos] = useState({ x: 20, y: 80 });
+
   useEffect(() => {
     setHasMounted(true);
-    if (!isMinimized) localStorage.setItem('music-size', JSON.stringify(size));
-  }, [size, isMinimized]);
-
-  if (!hasMounted || !selectedPlaylist) return null;
-
-  // Viewport Boundary Safety Check
-  const [safePos, setSafePos] = useState(lastPos);
-  const win = typeof window !== 'undefined' ? window : { innerWidth: 1200, innerHeight: 800 };
+    
+    // Load persisted data safely on mount
+    const savedPos = localStorage.getItem('music-pos');
+    const savedSize = localStorage.getItem('music-size');
+    if (savedPos) setSafePos(JSON.parse(savedPos));
+    if (savedSize) setSize(JSON.parse(savedSize));
+  }, []);
 
   useEffect(() => {
+    if (hasMounted && !isMinimized) {
+      localStorage.setItem('music-size', JSON.stringify(size));
+    }
+  }, [size, isMinimized, hasMounted]);
+
+  useEffect(() => {
+    if (!hasMounted) return;
     const checkVisibility = () => {
       const maxX = window.innerWidth - 320;
       const maxY = window.innerHeight - 100;
-      if (lastPos.x > maxX || lastPos.y > maxY || lastPos.x < 0 || lastPos.y < 0) {
+      if (safePos.x > maxX || safePos.y > maxY || safePos.x < 0 || safePos.y < 0) {
         setSafePos({ x: 20, y: 80 });
       }
     };
     checkVisibility();
     window.addEventListener('resize', checkVisibility);
     return () => window.removeEventListener('resize', checkVisibility);
-  }, [lastPos.x, lastPos.y]);
+  }, [safePos.x, safePos.y, hasMounted]);
+
+  if (!hasMounted || !selectedPlaylist) return null;
+
+  const win = typeof window !== 'undefined' ? window : { innerWidth: 1200, innerHeight: 800 };
 
   return (
     <AnimatePresence>
