@@ -114,7 +114,7 @@ Insightify moves away from "bulky" UI trends in favor of a **High-Density Inform
 ## 👤 Author
 
 **Kunal Kumar**  
-Full Stack Developer · Ajmer, Rajasthan, India  
+Full Stack Developer · Udaipur, Rajasthan, India  
 
 ---
 
