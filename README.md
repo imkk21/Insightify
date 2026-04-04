@@ -2,7 +2,7 @@
 
 # Insightify.
 
-### AI-Powered Personalized Developer Insight Platform (V2 Neural Evolution)
+### AI-Powered Personalized Developer Insight Platform (Neural Evolution)
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org)
@@ -13,16 +13,16 @@
 
 > A high-fidelity developer dashboard aggregating GitHub activity, live weather, and tech news — now featuring **Sonic Flow** (Spotify Integration) and a **Floating Neural Player**.
 
-![Insightify V2 Dashboard](https://i.imgur.com/placeholder.png)
+![Insightify Dashboard](https://i.imgur.com/placeholder.png)
 
 </div>
 
 ---
 
-## 📌 Recent Updates (V2 Restoration)
+## 📌 Recent Updates (Neural Restoration)
 
-Insightify has been upgraded to its **V2 Design Language**, prioritizing data density and professional aesthetics:
-- **Classic V2 Glassmorphism**: Sharper corners (`1.5rem`), higher contrast, and frosted glass effects.
+Insightify has been upgraded to its **Modern Design Language**, prioritizing data density and professional aesthetics:
+- **Classic Glassmorphism**: Sharper corners (`1.5rem`), higher contrast, and frosted glass effects.
 - **Sonic Flow Integration**: Native Spotify playback synchronized with your coding environments.
 - **Floating Neural Player**: A draggable, resizable, and persistent PiP music player.
 - **Enhanced Data Density**: Restored GitHub Language Vectors and expanded Atmospheric sensor data.
@@ -49,7 +49,7 @@ Insightify has been upgraded to its **V2 Design Language**, prioritizing data de
 ### Frontend
 - **React 18** (Vite 5)
 - **Framer Motion** (Neural animations & draggable UI)
-- **Tailwind CSS** (V2 Glassmorphism system)
+- **Tailwind CSS** (Modern Glassmorphism system)
 - **Lucide React** (Consistent iconography)
 - **Spotify Web SDK** (Playback integration)
 
@@ -69,7 +69,7 @@ insightify/
 │   ├── components/
 │   │   ├── MusicFloatingPlayer.jsx  # Draggable Neural interface
 │   │   ├── InsightBanner.jsx        # Gemini AI hero
-│   │   └── UI.jsx                   # V2 standardized components
+│   │   └── UI.jsx                   # Standardized components
 │   ├── context/
 │   │   ├── AuthContext.jsx
 │   │   └── MusicContext.jsx         # Spotify Global State
@@ -97,7 +97,7 @@ insightify/
 
 ## 💡 Design Philosophy
 
-Insightify V2 moves away from "bulky" UI trends in favor of a **High-Density Information Interface**. By reducing border-radii to `1.5rem` and emphasizing a "Frosted Glass" grid, the platform provides more data-per-pixel for power users while maintaining a premium, futuristic look.
+Insightify moves away from "bulky" UI trends in favor of a **High-Density Information Interface**. By reducing border-radii to `1.5rem` and emphasizing a "Frosted Glass" grid, the platform provides more data-per-pixel for power users while maintaining a premium, futuristic look.
 
 ---
 
