@@ -94,6 +94,6 @@ Insightify is a comprehensive, AI-powered neural intelligence system designed to
 
 ---
 
-**Student Name: [Your Name Here]**  
-**Reg. No.: [Your Reg Number here]**  
-**Course: [Your Course Name here]**
+**Student Name: Kunal Kumar**  
+**Reg. No.: 24MCA10074**  
+**Course: MCA 2024**
