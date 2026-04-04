@@ -101,6 +101,16 @@ Insightify moves away from "bulky" UI trends in favor of a **High-Density Inform
 
 ---
 
+## 🚀 Future Scope
+
+- **IDE Integration**: Developing a VS Code extension to bring neural insights and concentration controls directly into the coding environment.
+- **Biometric Synchronization**: Correlating focus sessions with heart-rate variability (HRV) from wearables (Apple Watch/Fitbit) to identify physiological peak performance windows.
+- **Team Intelligence**: Collaborative dashboards for engineering leads to monitor overall team momentum and health without micro-management.
+- **Automated Summarization**: AI-driven pull request summaries and documentation generation based on weekly commit patterns.
+- **Mobile Native Application**: Dedicated iOS/Android app featuring push notifications for "Peak Focus" alerts and atmospheric warnings.
+
+---
+
 ## 👤 Author
 
 **Kunal Kumar**  
