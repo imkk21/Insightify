@@ -13,7 +13,7 @@ const SLACK_WEBHOOK = /^https:\/\/hooks\.slack\.com\/services\/[A-Za-z0-9/_-]+$/
 
 const updateProfile = async (req, res) => {
   try {
-    const { city, displayName, lat, lon, slackWebhookUrl } = req.body;
+    const { city, displayName, lat, lon, slackWebhookUrl, publicProfile } = req.body;
     const updates = {};
     if (slackWebhookUrl !== undefined) {
       const url = String(slackWebhookUrl).trim();
@@ -22,6 +22,7 @@ const updateProfile = async (req, res) => {
       }
       updates.slackWebhookUrl = url;
     }
+    if (typeof publicProfile === 'boolean') updates.publicProfile = publicProfile;
     if (city !== undefined)       updates.city        = city;
     if (displayName !== undefined) updates.displayName = displayName;
     if (lat != null)              updates.lat         = lat;

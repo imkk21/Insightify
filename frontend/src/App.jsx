@@ -12,6 +12,7 @@ import ActivityPage from './pages/ActivityPage';
 import SettingsPage from './pages/SettingsPage';
 import FocusPage    from './pages/FocusPage';
 import CodeAssistantPage from './pages/CodeAssistantPage';
+import PublicProfilePage from './pages/PublicProfilePage';
 import LoadingScreen from './components/LoadingScreen';
 
 const ProtectedRoute = ({ children }) => {
@@ -35,6 +36,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+            <Route path="/u/:username" element={<PublicProfilePage />} /> {/* public, no login */}
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route index           element={<DashboardPage />} />
               <Route path="weather"  element={<WeatherPage />} />

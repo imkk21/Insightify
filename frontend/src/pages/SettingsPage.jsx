@@ -3,8 +3,55 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { userAPI } from '../services/api';
 import { PageHeader, Card, CardTitle, ErrorMsg } from '../components/UI';
-import { MapPin, LogOut, Send } from 'lucide-react';
+import { MapPin, LogOut, Send, Link2, Check, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { initials } from '../utils';
+
+function PublicProfileCard({ profile, onChange }) {
+  const [busy, setBusy] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState('');
+  const url = `${window.location.origin}/u/${profile?.githubUsername}`;
+
+  const toggle = async () => {
+    setBusy(true); setError('');
+    try {
+      await userAPI.updateProfile({ publicProfile: !profile.publicProfile });
+      await onChange();
+    } catch (e) { setError(e.response?.data?.error || e.message); }
+    finally { setBusy(false); }
+  };
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <Card className="mb-4">
+      <CardTitle title="Public profile" subtitle="A shareable page with your public GitHub activity and a 'year in code' card. Never shows your email, tasks or reports." />
+      {!profile?.githubConnected ? (
+        <p className="text-sm text-olive">Connect GitHub on the <Link to="/activity" className="link">Activity</Link> page first.</p>
+      ) : (
+        <>
+          <label className="flex cursor-pointer items-center gap-3">
+            <input type="checkbox" role="switch" checked={!!profile.publicProfile} onChange={toggle} disabled={busy} className="h-5 w-5 accent-plum" />
+            <span className="font-semibold">{profile.publicProfile ? 'Your profile is public' : 'Make my profile public'}</span>
+          </label>
+          {profile.publicProfile && (
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <code className="min-w-0 flex-1 truncate rounded bg-white px-4 py-2.5 text-sm">{url}</code>
+              <button onClick={copy} className="btn-secondary">{copied ? <Check size={16} /> : <Link2 size={16} />} {copied ? 'Copied' : 'Copy'}</button>
+              <a href={url} target="_blank" rel="noreferrer" className="btn-ghost"><ExternalLink size={16} aria-hidden="true" /> Open</a>
+            </div>
+          )}
+        </>
+      )}
+      {error && <div className="mt-3"><ErrorMsg message={error} /></div>}
+    </Card>
+  );
+}
 
 // The webhook is write-only: the API only ever tells us whether one is saved.
 function SlackCard({ connected, onChange }) {
@@ -144,6 +191,7 @@ export default function SettingsPage() {
         </form>
       </Card>
 
+      <PublicProfileCard profile={profile} onChange={refreshProfile} />
       <SlackCard connected={!!profile?.slackConnected} onChange={refreshProfile} />
 
       <Card>

@@ -6,7 +6,7 @@ const TINTS = ['#e5e5e0', 'rgba(33,25,34,0.25)', 'rgba(33,25,34,0.5)', 'rgba(33,
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 // Quartiles of the non-zero days (like GitHub), so one huge day doesn't wash everything out
-const levels = (days) => {
+export const levels = (days) => {
   const nz = days.map((d) => d.count).filter(Boolean).sort((a, b) => a - b);
   const q = (p) => nz[Math.floor((nz.length - 1) * p)] ?? 0;
   const [q1, q2, q3] = [q(0.25), q(0.5), q(0.75)];

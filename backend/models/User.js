@@ -19,6 +19,8 @@ const userSchema = new mongoose.Schema(
     spotifyTokenExpiry:  { type: Date,   default: null },
     // Slack incoming webhook for reports (secret: anyone with it can post to the channel)
     slackWebhookUrl: { type: String, default: '' },
+    // Opt-in public page at /u/<githubUsername> (public GitHub data only)
+    publicProfile:   { type: Boolean, default: false },
     lastLogin:       { type: Date, default: Date.now },
   },
   {

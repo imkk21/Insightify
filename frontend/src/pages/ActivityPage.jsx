@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import { useGithub } from '../hooks/useData';
 import { PageHeader, Card, CardTitle, Masonry, Stat, LangBar, Loader, EmptyState, ErrorMsg, RefreshButton } from '../components/UI';
 import { ContributionCalendar, BarChart, codingPatterns, WEEKDAYS, hourLabel } from '../components/Charts';
 import { timeAgo } from '../utils';
-import { Star, GitFork, GitCommit, GitPullRequest, ExternalLink } from 'lucide-react';
+import { Star, GitFork, GitCommit, GitPullRequest, ExternalLink, Share2 } from 'lucide-react';
 
 export const GithubMark = ({ size = 24 }) => (
   <svg width={size} height={size} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -58,6 +60,7 @@ const ListRow = ({ href, icon, title, meta }) => (
 
 export default function ActivityPage() {
   const { data, loading, error, sync, connect, disconnect } = useGithub();
+  const { profile: me } = useAuth();
   const connected = !!data?.totals;
 
   if (!connected) {
@@ -84,6 +87,10 @@ export default function ActivityPage() {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Link to={me?.publicProfile ? `/u/${data.username}` : '/settings'} className="btn-ghost"
+            title={me?.publicProfile ? 'Your public profile' : 'Turn on your public profile in Settings'}>
+            <Share2 size={16} aria-hidden="true" /> {me?.publicProfile ? 'Public profile' : 'Share'}
+          </Link>
           <a href={p.url} target="_blank" rel="noreferrer" className="btn-ghost"><ExternalLink size={16} aria-hidden="true" /> GitHub</a>
           <RefreshButton onClick={sync} loading={loading} />
           <button onClick={disconnect} className="btn-ghost">Disconnect</button>
