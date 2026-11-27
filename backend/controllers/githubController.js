@@ -3,7 +3,7 @@ const User = require('../models/User');
 const { fetchGithubData } = require('../services/githubService');
 
 const handleErr = (err, res) => {
-  if (err.response?.status === 401) return res.status(502).json({ error: 'GitHub token invalid or expired. Update GITHUB_TOKEN in your .env file.' });
+  if (err.response?.status === 401) return res.status(502).json({ error: 'GitHub token invalid or expired. Server GITHUB_TOKEN needs updating.' });
   if (err.response?.status === 404) return res.status(404).json({ error: 'GitHub username not found. Please check the username and try again.' });
   if (err.response?.status === 403) return res.status(429).json({ error: 'GitHub API rate limit hit. Try again in 1 hour.' });
   return res.status(500).json({ error: err.message });
@@ -23,7 +23,7 @@ const getStats = async (req, res) => {
     if (!username) {
       return res.status(400).json({ error: 'GitHub not connected. Use the "Connect GitHub" button.' });
     }
-    const data = await fetchGithubData(username, user.githubToken);
+    const data = await fetchGithubData(username);
     const stats = await GithubStats.findOneAndUpdate({ uid }, { uid, ...data }, { upsert: true, new: true });
     res.json(stats);
   } catch (err) { handleErr(err, res); }
@@ -38,7 +38,7 @@ const syncStats = async (req, res) => {
     if (!username) {
       return res.status(400).json({ error: 'GitHub not connected. Use the "Connect GitHub" button.' });
     }
-    const data = await fetchGithubData(username, user.githubToken);
+    const data = await fetchGithubData(username);
     const stats = await GithubStats.findOneAndUpdate({ uid }, { uid, ...data }, { upsert: true, new: true });
     res.json({ message: 'GitHub stats synced', stats });
   } catch (err) { handleErr(err, res); }
@@ -47,20 +47,20 @@ const syncStats = async (req, res) => {
 /** POST /api/github/connect */
 const connectGithub = async (req, res) => {
   try {
-    const { githubUsername, githubToken } = req.body;
-    if (!githubUsername?.trim()) {
+    const { githubUsername } = req.body;
+    if (typeof githubUsername !== 'string' || !githubUsername.trim()) {
       return res.status(400).json({ error: 'GitHub username is required.' });
     }
 
     const uid = req.user.uid;
-    const cleanUsername = githubUsername.trim().toLowerCase();
+    const cleanUsername = githubUsername.trim();
 
-    // ── KEY CHECK: Is this GitHub username already linked to a DIFFERENT account? ──
+    // Is this GitHub username already linked to a DIFFERENT account? (exact, case-insensitive)
     const existingUser = await User.findOne({
-      githubUsername: { $regex: new RegExp(`^${cleanUsername}$`, 'i') },
-      uid: { $ne: uid }, // not the current user
+      githubUsername: cleanUsername,
+      uid: { $ne: uid },
       githubConnected: true,
-    });
+    }).collation({ locale: 'en', strength: 2 });
 
     if (existingUser) {
       return res.status(409).json({
@@ -69,14 +69,13 @@ const connectGithub = async (req, res) => {
     }
 
     // Verify the username actually exists on GitHub before saving
-    const data = await fetchGithubData(githubUsername.trim(), githubToken);
+    const data = await fetchGithubData(cleanUsername);
 
     // Save to user profile
     await User.findOneAndUpdate(
       { uid },
       {
         githubUsername: data.username, // use the exact casing from GitHub API
-        githubToken:    githubToken || '',
         githubConnected: true,
       },
       { new: true }
@@ -101,7 +100,7 @@ const disconnectGithub = async (req, res) => {
     const uid = req.user.uid;
     await User.findOneAndUpdate(
       { uid },
-      { githubUsername: '', githubToken: '', githubConnected: false }
+      { githubUsername: '', githubConnected: false }
     );
     await GithubStats.deleteOne({ uid });
     res.json({ message: 'GitHub disconnected successfully' });

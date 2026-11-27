@@ -10,7 +10,7 @@ import NewsPage     from './pages/NewsPage';
 import InsightPage  from './pages/InsightPage';
 import ActivityPage from './pages/ActivityPage';
 import SettingsPage from './pages/SettingsPage';
-import DeepWorkPage from './pages/DeepWorkPage';
+import MusicPage    from './pages/MusicPage';
 import TasksPage    from './pages/TasksPage';
 import CodeAssistantPage from './pages/CodeAssistantPage';
 import LoadingScreen from './components/LoadingScreen';
@@ -41,7 +41,7 @@ export default function App() {
               <Route path="github"   element={<GithubPage />} />
               <Route path="weather"  element={<WeatherPage />} />
               <Route path="news"     element={<NewsPage />} />
-              <Route path="focus"    element={<DeepWorkPage />} />
+              <Route path="music"    element={<MusicPage />} />
               <Route path="tasks"    element={<TasksPage />} />
               <Route path="assistant" element={<CodeAssistantPage />} />
               <Route path="insight"  element={<InsightPage />} />

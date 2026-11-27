@@ -2,14 +2,12 @@ const axios = require('axios');
 
 const GH_BASE = 'https://api.github.com';
 
-// Use user's own OAuth token if available, else fall back to server token
-const headers = (userToken) => ({
-  Authorization: `token ${userToken || process.env.GITHUB_TOKEN}`,
-  Accept: 'application/vnd.github.v3+json',
-});
-
-const fetchGithubData = async (username, userToken) => {
-  const h = headers(userToken);
+const fetchGithubData = async (username) => {
+  const h = {
+    Authorization: `token ${process.env.GITHUB_TOKEN}`,
+    Accept: 'application/vnd.github.v3+json',
+  };
+  username = encodeURIComponent(username);
 
   const { data: profile } = await axios.get(`${GH_BASE}/users/${username}`, { headers: h });
 
@@ -43,7 +41,7 @@ const fetchGithubData = async (username, userToken) => {
   for (const repo of repos.slice(0, 5)) {
     try {
       const { data: commits } = await axios.get(
-        `${GH_BASE}/repos/${username}/${repo.name}/commits?per_page=5`,
+        `${GH_BASE}/repos/${username}/${repo.name}/commits?author=${username}&per_page=5`,
         { headers: h }
       );
       commits.forEach((c) => {

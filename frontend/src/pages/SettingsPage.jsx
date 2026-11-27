@@ -93,7 +93,7 @@ export default function SettingsPage() {
             </div>
 
             {error && <div className="mt-4"><ErrorMsg message={error} /></div>}
-            {saved && <div className="mt-4 text-teal text-sm bg-teal/5 border border-teal/20 rounded-xl px-4 py-3">✓ Settings saved</div>}
+            {saved && <div className="mt-4 text-teal2 text-sm bg-teal2/5 border border-teal2/20 rounded-xl px-4 py-3">✓ Settings saved</div>}
 
             <button onClick={handleSave} disabled={saving} className="btn-primary mt-5 w-full justify-center flex">
               {saving ? 'Saving…' : 'Save Settings'}
@@ -101,30 +101,6 @@ export default function SettingsPage() {
           </CardBody>
         </Card>
 
-        {/* Tech Stack */}
-        <Card>
-          <CardHeader title="Tech Stack" subtitle="Technologies powering Insightify" />
-          <CardBody>
-            <div className="space-y-4">
-              {[
-                { category: 'Frontend',  items: ['React.js','Vite','Tailwind CSS','Axios','Firebase Auth SDK'] },
-                { category: 'Backend',   items: ['Node.js','Express.js','MongoDB Atlas','Firebase Admin','Node-Cron'] },
-                { category: 'AI & APIs', items: ['Google Gemini 1.5','GitHub API','OpenWeather API','News API'] },
-              ].map(({ category, items }) => (
-                <div key={category}>
-                  <div className="text-[10px] font-mono text-ink3 uppercase tracking-[2px] mb-2">{category}</div>
-                  <div className="flex flex-wrap gap-2">
-                    {items.map((item) => (
-                      <span key={item} className="px-3 py-1 rounded-full bg-cream border border-black/[0.08] text-xs text-ink3 font-mono hover:border-amber hover:text-amber transition-colors cursor-default">
-                        {item}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardBody>
-        </Card>
       </div>
     </div>
   );

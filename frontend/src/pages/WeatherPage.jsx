@@ -61,7 +61,7 @@ export default function WeatherPage() {
                     { label: 'Sunrise',    value: new Date(c.sunrise).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }) },
                     { label: 'Sunset',     value: new Date(c.sunset).toLocaleTimeString('en-IN',  { hour: '2-digit', minute: '2-digit' }) },
                   ].map(({ label, value }) => (
-                    <div key={label} className="bg-cream rounded-xl p-3">
+                    <div key={label} className="bg-foreground/5 rounded-xl p-3">
                       <div className="text-[10px] text-ink3 uppercase tracking-wide">{label}</div>
                       <div className="font-mono text-sm font-medium text-ink mt-0.5">{value}</div>
                     </div>
@@ -78,7 +78,7 @@ export default function WeatherPage() {
             {loading ? <DotLoader label="Loading forecast…" /> : data?.forecast?.length ? (
               <div className="space-y-3">
                 {data.forecast.map((day, i) => (
-                  <div key={i} className="flex items-center justify-between bg-cream rounded-xl px-4 py-3">
+                  <div key={i} className="flex items-center justify-between bg-foreground/5 rounded-xl px-4 py-3">
                     <div className="font-medium text-sm text-ink w-28">
                       {i === 0 ? 'Today' : new Date(day.date).toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' })}
                     </div>

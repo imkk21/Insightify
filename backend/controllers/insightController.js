@@ -2,7 +2,10 @@ const Insight = require('../models/Insight');
 const GithubStats = require('../models/GithubStats');
 const Weather = require('../models/Weather');
 const News = require('../models/News');
-const { generateInsight } = require('../services/insightService');
+const { generateInsight, getModel } = require('../services/insightService');
+
+const MAX_PROMPT = 2000;
+const MAX_CODE   = 20000;
 
 /** GET /api/insight  – latest insight */
 const getLatestInsight = async (req, res) => {
@@ -16,7 +19,7 @@ const getLatestInsight = async (req, res) => {
 /** GET /api/insight/history */
 const getInsightHistory = async (req, res) => {
   try {
-    const limit = parseInt(req.query.limit) || 10;
+    const limit = Math.min(Math.max(parseInt(req.query.limit) || 10, 1), 50);
     const insights = await Insight.find({ uid: req.user.uid })
       .sort({ createdAt: -1 }).limit(limit);
     res.json(insights);
@@ -30,7 +33,7 @@ const generateNewInsight = async (req, res) => {
     const [github, weather, news] = await Promise.all([
       GithubStats.findOne({ uid }).then(doc => doc?.toObject() || null),
       Weather.findOne({ uid }).then(doc => doc?.toObject() || null),
-      News.findOne({ uid }).then(doc => doc?.toObject() || null),
+      News.findById('global').then(doc => doc?.toObject() || null),
     ]);
 
     const result = await generateInsight({ github, weather, news });
@@ -43,7 +46,7 @@ const generateNewInsight = async (req, res) => {
       content: result.content,
       prompt:  result.prompt,
       model:   result.model,
-      type:    req.body.type || 'weekly',
+      type:    'weekly',
       weekOf,
       dataSnapshot: {
         commits:   github?.weeklyCommits,
@@ -67,12 +70,13 @@ const generateCustomInsight = async (req, res) => {
   try {
     const uid = req.user.uid;
     const { prompt } = req.body;
-    if (!prompt) return res.status(400).json({ error: 'prompt is required' });
+    if (typeof prompt !== 'string' || !prompt.trim()) return res.status(400).json({ error: 'prompt is required' });
+    if (prompt.length > MAX_PROMPT) return res.status(400).json({ error: `Prompt too long (max ${MAX_PROMPT} chars)` });
 
     const [github, weather, news] = await Promise.all([
       GithubStats.findOne({ uid }),
       Weather.findOne({ uid }),
-      News.findOne({ uid }),
+      News.findById('global'),
     ]);
 
     const result = await generateInsight({ github, weather, news, customPrompt: prompt });
@@ -96,9 +100,10 @@ const generateCustomInsight = async (req, res) => {
 const generateCodeRefactor = async (req, res) => {
   try {
     const { code, language } = req.body;
-    if (!code) return res.status(400).json({ error: 'Code snippet is required' });
+    if (typeof code !== 'string' || !code.trim()) return res.status(400).json({ error: 'Code snippet is required' });
+    if (code.length > MAX_CODE) return res.status(400).json({ error: `Code too long (max ${MAX_CODE} chars)` });
 
-    const model = require('../services/insightService').getModel();
+    const model = getModel();
     if (!model) return res.status(500).json({ error: 'AI model not configured' });
 
     const prompt = `You are an expert senior software engineer. Optimize, refactor, and explain the following ${language || ''} code snippet. 

@@ -3,9 +3,9 @@ import 'react-calendar-heatmap/dist/styles.css';
 import { useGithub } from '../hooks/useData';
 import { PageHeader, Card, CardHeader, CardBody, SyncButton, DotLoader, EmptyState } from '../components/UI';
 import { motion } from 'framer-motion';
-import { GitCommit, Activity as ActivityIcon } from 'lucide-react';
+import { GitCommit } from 'lucide-react';
+import { timeAgo, PALETTE } from '../utils';
 
-const DOT_COLORS = ['#e8a030','#14b8a6','#4361b8','#e05a6a','#6b6258'];
 
 function GithubHeatmap({ commits }) {
   const counts = {};
@@ -52,13 +52,6 @@ export default function ActivityPage() {
   const { data, loading, sync } = useGithub();
   const isConnected = !!data?.username;
 
-  const timeAgo = (date) => {
-    const diff = (Date.now() - new Date(date)) / 1000;
-    if (diff < 3600)  return `${Math.round(diff / 60)}m ago`;
-    if (diff < 86400) return `${Math.round(diff / 3600)}h ago`;
-    return `${Math.round(diff / 86400)}d ago`;
-  };
-
   const containerVariants = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { staggerChildren: 0.1 } }
@@ -77,7 +70,7 @@ export default function ActivityPage() {
 
       <motion.div variants={itemVariants}>
         <Card className="mb-6 overflow-hidden">
-          <CardHeader title="Contribution Heatmap" subtitle="Active coding days · past 6 months" />
+          <CardHeader title="Contribution Heatmap" subtitle="Your recent commits (latest 5 per repo, 5 most recently updated repos)" />
           <CardBody className="bg-card backdrop-blur-md">
             {isConnected ? <GithubHeatmap commits={data?.recentCommits} /> : <EmptyState emoji="🔗" title="Connect GitHub to see telemetry map" subtitle="Go to GitHub Stats page to connect" />}
           </CardBody>
@@ -100,7 +93,7 @@ export default function ActivityPage() {
                       className="flex items-start gap-4 px-6 py-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors no-underline group"
                     >
                       <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-background border border-border shadow-sm group-hover:scale-110 transition-transform">
-                        <GitCommit size={14} style={{ color: DOT_COLORS[i % 5] }} />
+                        <GitCommit size={14} style={{ color: PALETTE[i % 5] }} />
                       </div>
                       <div className="min-w-0 pt-1">
                         <div className="text-[14px] font-medium text-foreground leading-snug group-hover:text-amber transition-colors truncate">{c.message}</div>
@@ -118,33 +111,10 @@ export default function ActivityPage() {
 
         <motion.div variants={itemVariants}>
           <Card className="h-full">
-            <CardHeader title="System Status" subtitle="Services & data sync health nodes" badge="Live" badgeStyle="bg-teal2/10 text-teal2 border-teal2/20" />
+            <CardHeader title="GitHub Summary" subtitle="From your last sync" />
             <CardBody>
-              <div className="space-y-3">
-                {[
-                  { label: 'Weekly Insight Cron',  detail: 'Every Monday 08:00 IST' },
-                  { label: 'Hourly News Sync',     detail: 'Every hour on the hour' },
-                  { label: 'Firebase Auth',        detail: 'Key Verified' },
-                  { label: 'MongoDB Atlas',        detail: '5 active nodes' },
-                  { label: 'GitHub API',           detail: isConnected ? `@${data?.username}` : 'Offline' },
-                  { label: 'OpenWeather API',      detail: 'Cache: 30 min TTL' },
-                ].map(({ label, detail }) => (
-                  <div key={label} className="flex items-center justify-between bg-card border border-border rounded-2xl px-5 py-4">
-                    <div>
-                      <div className="text-sm font-bold text-foreground">{label}</div>
-                      <div className="text-xs text-ink3 font-mono mt-1">{detail}</div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-teal2 animate-pulse" />
-                      <span className="text-xs font-mono font-medium text-teal2">Running</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {isConnected && (
-                <div className="mt-6 pt-6 border-t border-border">
-                  <div className="grid grid-cols-2 gap-4">
+              {isConnected ? (
+                <div className="grid grid-cols-2 gap-4">
                     {[
                       { label: 'Weekly Commits', value: data?.weeklyCommits },
                       { label: 'Total Repos',    value: data?.totalRepos },
@@ -156,9 +126,8 @@ export default function ActivityPage() {
                         <div className="font-syne font-black text-2xl text-foreground mt-1">{value ?? '—'}</div>
                       </div>
                     ))}
-                  </div>
                 </div>
-              )}
+              ) : <EmptyState emoji="🔗" title="Connect GitHub to see your stats" />}
             </CardBody>
           </Card>
         </motion.div>

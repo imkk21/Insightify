@@ -1,4 +1,5 @@
 const axios = require('axios');
+const News = require('../models/News');
 
 const NEWS_BASE = 'https://newsapi.org/v2';
 
@@ -33,4 +34,14 @@ const fetchNewsData = async () => {
   return { articles, fetchedAt: new Date() };
 };
 
-module.exports = { fetchNewsData };
+const ONE_HOUR = 60 * 60 * 1000;
+
+/** Shared headlines, refreshed from NewsAPI at most once an hour (unless forced). */
+const getLatestNews = async ({ force = false } = {}) => {
+  const cached = await News.findById('global');
+  if (!force && cached && Date.now() - cached.fetchedAt.getTime() < ONE_HOUR) return cached;
+  const data = await fetchNewsData();
+  return News.findByIdAndUpdate('global', data, { upsert: true, new: true });
+};
+
+module.exports = { getLatestNews };

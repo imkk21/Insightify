@@ -15,16 +15,6 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-api.interceptors.response.use(
-  (res) => res,
-  (err) => {
-    if (err.response?.status === 401) {
-      window.location.href = '/login';
-    }
-    return Promise.reject(err);
-  }
-);
-
 export const authAPI = {
   login:  () => api.post('/auth/login'),
   getMe:  () => api.get('/auth/me'),
@@ -33,7 +23,7 @@ export const authAPI = {
 export const githubAPI = {
   getStats:   ()                       => api.get('/github/stats'),
   sync:       ()                       => api.post('/github/sync'),
-  connect:    (githubUsername, githubToken) => api.post('/github/connect', { githubUsername, githubToken }),
+  connect:    (githubUsername)            => api.post('/github/connect', { githubUsername }),
   disconnect: ()                       => api.delete('/github/disconnect'),
 };
 
@@ -43,8 +33,7 @@ export const weatherAPI = {
 };
 
 export const newsAPI = {
-  get:  () => api.get('/news'),
-  sync: () => api.post('/news/sync'),
+  get: () => api.get('/news'),
 };
 
 export const insightAPI = {
@@ -60,11 +49,6 @@ export const spotifyAPI = {
   getStatus:   () => api.get('/spotify/status'),
   getPlaylists: () => api.get('/spotify/playlists'),
   disconnect: () => api.delete('/spotify/disconnect'),
-};
-
-export const focusAPI = {
-  getSessions: () => api.get('/focus'),
-  saveSession: (data) => api.post('/focus', data),
 };
 
 export const taskAPI = {

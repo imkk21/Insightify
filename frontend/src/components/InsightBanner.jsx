@@ -1,12 +1,6 @@
-export default function InsightBanner({ insight, onGenerate, generating }) {
-  const timeAgo = (date) => {
-    if (!date) return 'Never';
-    const diff = (Date.now() - new Date(date)) / 1000;
-    if (diff < 3600)  return `${Math.round(diff / 60)} min ago`;
-    if (diff < 86400) return `${Math.round(diff / 3600)} hrs ago`;
-    return `${Math.round(diff / 86400)} days ago`;
-  };
+import { timeAgo } from '../utils';
 
+export default function InsightBanner({ insight, onGenerate, generating }) {
   return (
     <div className="bg-[#1a1714] rounded-3xl p-5 sm:p-9 relative overflow-hidden animate-slide-in shadow-2xl border border-white/5">
       <div className="absolute -top-16 -right-16 w-48 h-48 rounded-full bg-amber/10 blur-xl pointer-events-none" />
