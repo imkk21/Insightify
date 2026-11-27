@@ -10,7 +10,7 @@ const MAX_CODE   = 20000;
 /** GET /api/insight  – latest insight */
 const getLatestInsight = async (req, res) => {
   try {
-    const insight = await Insight.findOne({ uid: req.user.uid }).sort({ createdAt: -1 });
+    const insight = await Insight.findOne({ uid: req.user.uid, type: 'weekly' }).sort({ createdAt: -1 });
     if (!insight) return res.status(404).json({ error: 'No insights yet. Click "Generate Insight" to create your first.' });
     res.json(insight);
   } catch (err) { res.status(500).json({ error: err.message }); }

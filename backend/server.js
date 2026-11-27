@@ -43,6 +43,7 @@ app.use('/api/insight', require('./routes/insightRoutes'));
 app.use('/api/user',    require('./routes/userRoutes'));
 app.use('/api/tasks',   require('./routes/taskRoutes'));
 app.use('/api/spotify', require('./routes/spotifyRoutes'));
+app.use('/api/reports', require('./routes/reportRoutes'));
 
 // Health check
 app.get('/api/health', (_req, res) =>

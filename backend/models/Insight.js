@@ -6,7 +6,8 @@ const insightSchema = new mongoose.Schema(
     content: { type: String, required: true },
     prompt:  String,
     model:   String,
-    type:    { type: String, enum: ['weekly', 'custom'], default: 'weekly' },
+    // weekly = short AI insight (Today page), custom = Q&A, standup / report = Markdown reports
+    type:    { type: String, enum: ['weekly', 'custom', 'standup', 'report'], default: 'weekly' },
     weekOf:  Date,
     dataSnapshot: {
       commits:   Number,

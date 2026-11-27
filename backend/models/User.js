@@ -17,6 +17,8 @@ const userSchema = new mongoose.Schema(
     spotifyAccessToken:  { type: String, default: '' },
     spotifyRefreshToken: { type: String, default: '' },
     spotifyTokenExpiry:  { type: Date,   default: null },
+    // Slack incoming webhook for reports (secret: anyone with it can post to the channel)
+    slackWebhookUrl: { type: String, default: '' },
     lastLogin:       { type: Date, default: Date.now },
   },
   {
@@ -27,6 +29,8 @@ const userSchema = new mongoose.Schema(
         delete ret.spotifyAccessToken;
         delete ret.spotifyRefreshToken;
         delete ret.githubToken; // legacy field still present on old documents
+        ret.slackConnected = !!ret.slackWebhookUrl;
+        delete ret.slackWebhookUrl;
         return ret;
       },
     },

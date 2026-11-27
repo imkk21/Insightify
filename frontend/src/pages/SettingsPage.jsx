@@ -3,8 +3,51 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { userAPI } from '../services/api';
 import { PageHeader, Card, CardTitle, ErrorMsg } from '../components/UI';
-import { MapPin, LogOut } from 'lucide-react';
+import { MapPin, LogOut, Send } from 'lucide-react';
 import { initials } from '../utils';
+
+// The webhook is write-only: the API only ever tells us whether one is saved.
+function SlackCard({ connected, onChange }) {
+  const [url, setUrl] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  const save = async (value) => {
+    setBusy(true); setError('');
+    try {
+      await userAPI.updateProfile({ slackWebhookUrl: value });
+      setUrl('');
+      await onChange();
+    } catch (e) { setError(e.response?.data?.error || e.message); }
+    finally { setBusy(false); }
+  };
+
+  return (
+    <Card className="mb-4">
+      <CardTitle title="Slack" subtitle={connected ? 'Connected: standups and weekly reports can be sent to your channel' : 'Send standups and weekly reports to a Slack channel'} />
+      {connected ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="badge bg-forest/10 text-forest"><Send size={12} aria-hidden="true" /> Webhook saved</span>
+          <button onClick={() => save('')} disabled={busy} className="btn-ghost">Remove</button>
+        </div>
+      ) : (
+        <form onSubmit={(e) => { e.preventDefault(); save(url); }} className="space-y-2">
+          <label htmlFor="slack" className="block text-sm font-semibold">Incoming webhook URL</label>
+          <div className="flex gap-2">
+            <input id="slack" className="input" type="url" placeholder="https://hooks.slack.com/services/…" value={url}
+              onChange={(e) => { setUrl(e.target.value); setError(''); }} />
+            <button type="submit" disabled={busy || !url.trim()} className="btn-primary">Save</button>
+          </div>
+          <p className="text-xs text-olive">
+            In Slack: Apps → Incoming Webhooks → Add to Slack → pick a channel → copy the URL.{' '}
+            <a className="link" href="https://api.slack.com/messaging/webhooks" target="_blank" rel="noreferrer">Guide</a>
+          </p>
+        </form>
+      )}
+      {error && <div className="mt-3"><ErrorMsg message={error} /></div>}
+    </Card>
+  );
+}
 
 export default function SettingsPage() {
   const { user, profile, refreshProfile, logout } = useAuth();
@@ -100,6 +143,8 @@ export default function SettingsPage() {
           <button type="submit" disabled={saving} className="btn-primary">{saving ? 'Saving…' : 'Save changes'}</button>
         </form>
       </Card>
+
+      <SlackCard connected={!!profile?.slackConnected} onChange={refreshProfile} />
 
       <Card>
         <CardTitle title="Account" subtitle="Signed in with Google" />

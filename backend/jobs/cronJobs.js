@@ -7,6 +7,7 @@ const { fetchWeatherData } = require('../services/weatherService');
 const { getLatestNews } = require('../services/newsService');
 const { generateInsight } = require('../services/insightService');
 const { saveStats } = require('../controllers/githubController');
+const { createReport, sendReportToSlack } = require('../controllers/reportController');
 
 /**
  * Sync GitHub + weather for every GitHub-connected user, then generate a weekly insight.
@@ -69,6 +70,19 @@ const hourlyNewsJob = async () => {
   }
 };
 
+/** Generate a report for every user with a Slack webhook and post it. */
+const slackReportJob = (type) => async () => {
+  const users = await User.find({ slackWebhookUrl: { $ne: '' } });
+  console.log(`[CRON] Sending ${type} to ${users.length} Slack user(s)`);
+  for (const user of users) {
+    try {
+      await sendReportToSlack(user, await createReport(user.uid, type));
+    } catch (err) {
+      console.error(`[CRON] ${type} failed for ${user.email}:`, err.response?.status || err.message);
+    }
+  }
+};
+
 const startCronJobs = () => {
   // Local dev shares the production database: never run scheduled writes from it
   if (process.env.NODE_ENV === 'development') {
@@ -77,7 +91,9 @@ const startCronJobs = () => {
   }
   cron.schedule('0 8 * * 1', weeklyInsightJob, { timezone: 'Asia/Kolkata' });
   cron.schedule('0 * * * *', hourlyNewsJob, { timezone: 'Asia/Kolkata' });
-  console.log('⏰ Cron jobs scheduled (Weekly insights: Mon 08:00 IST | Hourly news refresh)');
+  cron.schedule('0 9 * * 1-5', slackReportJob('standup'), { timezone: 'Asia/Kolkata' });
+  cron.schedule('30 9 * * 1', slackReportJob('report'), { timezone: 'Asia/Kolkata' });
+  console.log('⏰ Cron jobs scheduled (Insights Mon 08:00 | Standups Mon–Fri 09:00 | Weekly report Mon 09:30 IST | News hourly)');
 };
 
-module.exports = { startCronJobs };
+module.exports = { startCronJobs, weeklyInsightJob, hourlyNewsJob, slackReportJob };

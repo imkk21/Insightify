@@ -181,7 +181,7 @@ export const useInsight = () => {
     } finally { setGenerating(false); }
   };
 
-  return { latest, history, loading, error, generating, generate, askCustom };
+  return { latest, history, loading, error, generating, generate, askCustom, refreshHistory: loadHistory };
 };
 
 // ── Tasks ──────────────────────────────────────────────────────────────

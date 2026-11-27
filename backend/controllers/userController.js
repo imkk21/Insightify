@@ -8,10 +8,20 @@ const getProfile = async (req, res) => {
   } catch (err) { res.status(500).json({ error: err.message }); }
 };
 
+// Only real Slack webhooks: the server POSTs to this URL, so anything else would be an SSRF hole
+const SLACK_WEBHOOK = /^https:\/\/hooks\.slack\.com\/services\/[A-Za-z0-9/_-]+$/;
+
 const updateProfile = async (req, res) => {
   try {
-    const { city, displayName, lat, lon } = req.body;
+    const { city, displayName, lat, lon, slackWebhookUrl } = req.body;
     const updates = {};
+    if (slackWebhookUrl !== undefined) {
+      const url = String(slackWebhookUrl).trim();
+      if (url && !SLACK_WEBHOOK.test(url)) {
+        return res.status(400).json({ error: 'That is not a Slack incoming webhook URL (https://hooks.slack.com/services/…).' });
+      }
+      updates.slackWebhookUrl = url;
+    }
     if (city !== undefined)       updates.city        = city;
     if (displayName !== undefined) updates.displayName = displayName;
     if (lat != null)              updates.lat         = lat;

@@ -6,7 +6,7 @@ import LoginPage    from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import WeatherPage  from './pages/WeatherPage';
 import NewsPage     from './pages/NewsPage';
-import InsightPage  from './pages/InsightPage';
+import ReportsPage  from './pages/ReportsPage';
 import ActivityPage from './pages/ActivityPage';
 import SettingsPage from './pages/SettingsPage';
 import FocusPage    from './pages/FocusPage';
@@ -44,7 +44,8 @@ export default function App() {
               <Route path="music"    element={<Navigate to="/focus" replace />} />
               <Route path="tasks"    element={<Navigate to="/focus" replace />} />
               <Route path="assistant" element={<CodeAssistantPage />} />
-              <Route path="insight"  element={<InsightPage />} />
+              <Route path="reports"  element={<ReportsPage />} />
+              <Route path="insight"  element={<Navigate to="/reports" replace />} />
               <Route path="activity" element={<ActivityPage />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>

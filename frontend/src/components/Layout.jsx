@@ -8,7 +8,7 @@ import { initials } from '../utils';
 const NAV = [
   { label: 'Today',     to: '/', end: true },
   { label: 'Activity',  to: '/activity' },
-  { label: 'Insights',  to: '/insight' },
+  { label: 'Reports',   to: '/reports' },
   { label: 'Focus',     to: '/focus' },
   { label: 'Assistant', to: '/assistant' },
 ];

@@ -25,13 +25,18 @@ const refresh = async (uid) => {
 
 const notConnected = (res) => res.status(400).json({ error: 'GitHub not connected. Use the "Connect GitHub" button.' });
 
-/** GET /api/github/stats – cached for an hour */
+/** Cached stats if under an hour old, else refetched; null if GitHub isn't connected. */
+const freshStats = async (uid) => {
+  const cached = await GithubStats.findOne({ uid });
+  // `totals` marks the current data shape; older cached docs are refetched
+  if (cached?.totals && Date.now() - cached.fetchedAt.getTime() < ONE_HOUR) return cached;
+  return refresh(uid);
+};
+
+/** GET /api/github/stats */
 const getStats = async (req, res) => {
   try {
-    const cached = await GithubStats.findOne({ uid: req.user.uid });
-    // `totals` marks the current data shape; older cached docs are refetched
-    if (cached?.totals && Date.now() - cached.fetchedAt.getTime() < ONE_HOUR) return res.json(cached);
-    const stats = await refresh(req.user.uid);
+    const stats = await freshStats(req.user.uid);
     return stats ? res.json(stats) : notConnected(res);
   } catch (err) { handleErr(err, res); }
 };
@@ -83,4 +88,4 @@ const disconnectGithub = async (req, res) => {
   }
 };
 
-module.exports = { getStats, syncStats, connectGithub, disconnectGithub, saveStats };
+module.exports = { getStats, syncStats, connectGithub, disconnectGithub, saveStats, freshStats };

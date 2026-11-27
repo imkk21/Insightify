@@ -44,6 +44,11 @@ export const insightAPI = {
   refactor:   (code, lang) => api.post('/insight/refactor', { code, language: lang }),
 };
 
+export const reportAPI = {
+  create:      (type) => api.post('/reports', { type }),
+  sendToSlack: (id)   => api.post(`/reports/${id}/slack`),
+};
+
 export const spotifyAPI = {
   getLoginUrl: () => api.get('/spotify/login'),
   getStatus:   () => api.get('/spotify/status'),
