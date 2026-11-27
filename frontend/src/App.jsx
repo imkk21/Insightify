@@ -4,14 +4,12 @@ import { MusicProvider } from './context/MusicContext';
 import Layout from './components/Layout';
 import LoginPage    from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
-import GithubPage   from './pages/GithubPage';
 import WeatherPage  from './pages/WeatherPage';
 import NewsPage     from './pages/NewsPage';
 import InsightPage  from './pages/InsightPage';
 import ActivityPage from './pages/ActivityPage';
 import SettingsPage from './pages/SettingsPage';
-import MusicPage    from './pages/MusicPage';
-import TasksPage    from './pages/TasksPage';
+import FocusPage    from './pages/FocusPage';
 import CodeAssistantPage from './pages/CodeAssistantPage';
 import LoadingScreen from './components/LoadingScreen';
 
@@ -38,11 +36,13 @@ export default function App() {
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
               <Route index           element={<DashboardPage />} />
-              <Route path="github"   element={<GithubPage />} />
               <Route path="weather"  element={<WeatherPage />} />
               <Route path="news"     element={<NewsPage />} />
-              <Route path="music"    element={<MusicPage />} />
-              <Route path="tasks"    element={<TasksPage />} />
+              <Route path="focus"    element={<FocusPage />} />
+              {/* Old URLs from v1 */}
+              <Route path="github"   element={<Navigate to="/activity" replace />} />
+              <Route path="music"    element={<Navigate to="/focus" replace />} />
+              <Route path="tasks"    element={<Navigate to="/focus" replace />} />
               <Route path="assistant" element={<CodeAssistantPage />} />
               <Route path="insight"  element={<InsightPage />} />
               <Route path="activity" element={<ActivityPage />} />

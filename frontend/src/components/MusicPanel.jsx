@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { spotifyAPI } from '../services/api';
 import { useMusic } from '../context/MusicContext';
-import { PageHeader, Card, Loader, EmptyState, ErrorMsg } from '../components/UI';
+import { Card, CardTitle, Loader, EmptyState, ErrorMsg } from './UI';
 import { Headphones, Music } from 'lucide-react';
 
-export default function MusicPage() {
+export default function MusicPanel() {
   const { selectedPlaylist, setSelectedPlaylist, spotifyConnected, playlists, loadingPlaylists, checkSpotifyStatus } = useMusic();
   const [params] = useSearchParams();
   const [error, setError] = useState(params.get('error') ? 'Spotify sign-in did not complete. Please try again.' : '');
@@ -29,9 +29,11 @@ export default function MusicPage() {
 
   return (
     <div>
-      <PageHeader title="Music" subtitle="Pick a Spotify playlist. It keeps playing in the mini player while you browse.">
-        {spotifyConnected && <button onClick={disconnect} className="btn-ghost">Disconnect Spotify</button>}
-      </PageHeader>
+      <CardTitle
+        title="Music"
+        subtitle="Pick a Spotify playlist. It keeps playing in the mini player while you browse."
+        action={spotifyConnected && <button onClick={disconnect} className="btn-ghost">Disconnect Spotify</button>}
+      />
 
       {error && <div className="mb-6"><ErrorMsg message={error} /></div>}
 
@@ -53,7 +55,7 @@ export default function MusicPage() {
           />
         </Card>
       ) : (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 3xl:grid-cols-7">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 3xl:grid-cols-8">
           {playlists.map((p) => {
             const active = selectedPlaylist?.id === p.id;
             return (

@@ -51,12 +51,3 @@
   .no-scrollbar { scrollbar-width: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
 }
-
-/* Activity heatmap (react-calendar-heatmap) in plum tints */
-.react-calendar-heatmap text { font-size: 9px; fill: #62625b; }
-.react-calendar-heatmap rect { rx: 2px; }
-.react-calendar-heatmap .color-empty   { fill: #e5e5e0; }
-.react-calendar-heatmap .color-scale-1 { fill: rgba(33, 25, 34, 0.25); }
-.react-calendar-heatmap .color-scale-2 { fill: rgba(33, 25, 34, 0.5); }
-.react-calendar-heatmap .color-scale-3 { fill: rgba(33, 25, 34, 0.75); }
-.react-calendar-heatmap .color-scale-4 { fill: #211922; }

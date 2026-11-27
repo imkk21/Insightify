@@ -50,7 +50,7 @@ exports.getAuthUrl = (req, res) => {
 
 exports.callback = async (req, res) => {
   const uid = readState(req.query.state);
-  if (!uid || !req.query.code) return res.redirect(`${FRONTEND_URL}/music?error=spotify_auth_failed`);
+  if (!uid || !req.query.code) return res.redirect(`${FRONTEND_URL}/focus?error=spotify_auth_failed`);
 
   try {
     const { data } = await tokenRequest(new URLSearchParams({
@@ -65,10 +65,10 @@ exports.callback = async (req, res) => {
       spotifyTokenExpiry:  new Date(Date.now() + data.expires_in * 1000),
     });
 
-    res.redirect(`${FRONTEND_URL}/music?spotify=connected`);
+    res.redirect(`${FRONTEND_URL}/focus?spotify=connected`);
   } catch (error) {
     console.error('Spotify Callback Error:', error.response?.data || error.message);
-    res.redirect(`${FRONTEND_URL}/music?error=spotify_auth_failed`);
+    res.redirect(`${FRONTEND_URL}/focus?error=spotify_auth_failed`);
   }
 };
 

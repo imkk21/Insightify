@@ -48,7 +48,7 @@ export default {
       overlay: '0 8px 32px rgba(33, 25, 34, 0.16)', // floating player / overlays only
     },
     fontFamily: {
-      sans: ['-apple-system', 'system-ui', '"Segoe UI"', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', '"Fira Sans"', '"Droid Sans"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"'],
+      sans: ['Figtree', '-apple-system', 'system-ui', '"Segoe UI"', 'Roboto', 'Oxygen-Sans', 'Ubuntu', 'Cantarell', '"Fira Sans"', '"Droid Sans"', '"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"'],
       mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', '"Liberation Mono"', 'monospace'], // code blocks only
     },
     extend: {

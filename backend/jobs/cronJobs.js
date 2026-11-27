@@ -1,12 +1,12 @@
 const cron = require('node-cron');
 const User = require('../models/User');
-const GithubStats = require('../models/GithubStats');
 const Weather = require('../models/Weather');
 const Insight = require('../models/Insight');
 const { fetchGithubData } = require('../services/githubService');
 const { fetchWeatherData } = require('../services/weatherService');
 const { getLatestNews } = require('../services/newsService');
 const { generateInsight } = require('../services/insightService');
+const { saveStats } = require('../controllers/githubController');
 
 /**
  * Sync GitHub + weather for every GitHub-connected user, then generate a weekly insight.
@@ -22,10 +22,7 @@ const weeklyInsightJob = async () => {
 
   for (const user of users) {
     try {
-      const githubData = await fetchGithubData(user.githubUsername);
-      const github = await GithubStats.findOneAndUpdate(
-        { uid: user.uid }, { uid: user.uid, ...githubData }, { upsert: true, new: true }
-      );
+      const github = await saveStats(user.uid, await fetchGithubData(user.githubUsername));
 
       const weatherData = await fetchWeatherData({ city: user.city, lat: user.lat, lon: user.lon });
       const weather = await Weather.findOneAndUpdate(
@@ -44,9 +41,9 @@ const weeklyInsightJob = async () => {
         type:    'weekly',
         weekOf,
         dataSnapshot: {
-          commits:   github.weeklyCommits,
-          repos:     github.totalRepos,
-          stars:     github.totalStars,
+          commits:   github.weeklyContributions,
+          repos:     github.totals?.repos,
+          stars:     github.totals?.stars,
           city:      weather.city,
           temp:      weather.current?.temp,
           newsCount: news?.articles?.length,

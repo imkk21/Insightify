@@ -49,9 +49,9 @@ const generateNewInsight = async (req, res) => {
       type:    'weekly',
       weekOf,
       dataSnapshot: {
-        commits:   github?.weeklyCommits,
-        repos:     github?.totalRepos,
-        stars:     github?.totalStars,
+        commits:   github?.weeklyContributions,
+        repos:     github?.totals?.repos,
+        stars:     github?.totals?.stars,
         city:      weather?.city,
         temp:      weather?.current?.temp,
         newsCount: news?.articles?.length,

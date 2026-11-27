@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { PageHeader, Loader, ErrorMsg } from '../components/UI';
-import { useTasks } from '../hooks/useData';
+import { CardTitle, Loader, ErrorMsg } from './UI';
 import { Trash2, CircleCheck, Circle, Clock } from 'lucide-react';
 
 const COLUMNS = [
@@ -10,8 +9,7 @@ const COLUMNS = [
 ];
 const NEXT_STATUS = { 'todo': 'in-progress', 'in-progress': 'done', 'done': 'todo' };
 
-export default function TasksPage() {
-  const { tasks, loading, error, create, update, remove } = useTasks();
+export default function TasksPanel({ tasks, loading, error, create, update, remove }) {
   const [title, setTitle] = useState('');
 
   const add = async (e) => {
@@ -23,7 +21,7 @@ export default function TasksPage() {
 
   return (
     <div>
-      <PageHeader title="Tasks" subtitle="Click a task to move it to the next column." />
+      <CardTitle title="Tasks" subtitle="Click a task to move it to the next column." />
 
       <form onSubmit={add} className="mb-8 flex max-w-2xl gap-2">
         <label htmlFor="new-task" className="sr-only">New task</label>
