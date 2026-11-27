@@ -9,6 +9,7 @@ const { generateInsight } = require('../services/insightService');
 const { saveStats } = require('../controllers/githubController');
 const { createReport, sendReportToSlack } = require('../controllers/reportController');
 const { runScan } = require('../controllers/securityController');
+const { getOrCreateBriefing } = require('../controllers/briefingController');
 
 /**
  * Sync GitHub + weather for every GitHub-connected user, then generate a weekly insight.
@@ -97,6 +98,15 @@ const securityScanJob = async () => {
   }
 };
 
+/** Pre-generate each user's morning briefing so it's ready when they open the app. */
+const briefingJob = async () => {
+  const users = await User.find({}, { uid: 1, email: 1 });
+  for (const user of users) {
+    try { await getOrCreateBriefing(user.uid, -330); } // IST, in getTimezoneOffset() convention (east of UTC is negative)
+    catch (err) { console.error(`[CRON] Briefing failed for ${user.email}:`, err.message); }
+  }
+};
+
 const startCronJobs = () => {
   // Local dev shares the production database: never run scheduled writes from it
   if (process.env.NODE_ENV === 'development') {
@@ -105,10 +115,11 @@ const startCronJobs = () => {
   }
   cron.schedule('0 8 * * 1', weeklyInsightJob, { timezone: 'Asia/Kolkata' });
   cron.schedule('0 * * * *', hourlyNewsJob, { timezone: 'Asia/Kolkata' });
+  cron.schedule('0 7 * * *', briefingJob, { timezone: 'Asia/Kolkata' });
   cron.schedule('30 7 * * 1', securityScanJob, { timezone: 'Asia/Kolkata' });
   cron.schedule('0 9 * * 1-5', slackReportJob('standup'), { timezone: 'Asia/Kolkata' });
   cron.schedule('30 9 * * 1', slackReportJob('report'), { timezone: 'Asia/Kolkata' });
   console.log('⏰ Cron jobs scheduled (Insights Mon 08:00 | Standups Mon–Fri 09:00 | Weekly report Mon 09:30 IST | News hourly)');
 };
 
-module.exports = { startCronJobs, weeklyInsightJob, hourlyNewsJob, slackReportJob, securityScanJob };
+module.exports = { startCronJobs, weeklyInsightJob, hourlyNewsJob, slackReportJob, securityScanJob, briefingJob };

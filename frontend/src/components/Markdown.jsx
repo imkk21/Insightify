@@ -5,7 +5,7 @@ const INLINE = /(\*\*[^*]+\*\*|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/g;
 
 const inline = (text) =>
   text.split(INLINE).map((part, i) => {
-    if (part.startsWith('**') && part.endsWith('**')) return <strong key={i}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith('**') && part.endsWith('**')) return <strong key={i} className="font-semibold text-fg">{part.slice(2, -2)}</strong>;
     const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
     if (link) return <a key={i} href={link[2]} target="_blank" rel="noreferrer" className="link">{link[1]}</a>;
     return part;
@@ -27,11 +27,11 @@ export default function Markdown({ text = '' }) {
   }
 
   return (
-    <div className="space-y-3 text-sm leading-relaxed">
+    <div className="space-y-3 text-[13px] leading-6 text-muted">
       {blocks.map((b, i) =>
-        b.type === 'h' ? <h3 key={i} className="pt-1 font-bold first:pt-0">{inline(b.text)}</h3>
+        b.type === 'h' ? <h3 key={i} className="pt-2 text-sm font-semibold text-fg first:pt-0">{inline(b.text)}</h3>
         : b.type === 'ul' ? (
-          <ul key={i} className="list-disc space-y-1 pl-5 marker:text-silver">
+          <ul key={i} className="list-disc space-y-1 pl-5 marker:text-subtle">
             {b.items.map((item, j) => <li key={j}>{inline(item)}</li>)}
           </ul>
         ) : <p key={i}>{inline(b.text)}</p>

@@ -46,6 +46,14 @@ app.use('/api/spotify', require('./routes/spotifyRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/security', require('./routes/securityRoutes'));
 app.use('/api/public',   require('./routes/publicRoutes'));
+// Feature modules
+app.use('/api/autopilot', require('./routes/autopilotRoutes'));
+app.use('/api/codebase', require('./routes/codebaseRoutes'));
+app.use('/api/flow', require('./routes/flowRoutes'));
+app.use('/api/skills', require('./routes/skillsRoutes'));
+app.use('/api/briefing', require('./routes/briefingRoutes'));
+app.use('/api/rooms', require('./routes/roomsRoutes'));
+
 
 // Health check
 app.get('/api/health', (_req, res) =>

@@ -36,11 +36,26 @@ const tokenRequest = (params) => axios.post('https://accounts.spotify.com/api/to
   },
 });
 
+/** Valid access token for a User doc, refreshing (and saving) it if expired. Returns null if not connected. */
+const getSpotifyAccessToken = async (user) => {
+  if (!user?.spotifyAccessToken) return null;
+  if (user.spotifyTokenExpiry && new Date() > user.spotifyTokenExpiry) {
+    const { data } = await tokenRequest(new URLSearchParams({ grant_type: 'refresh_token', refresh_token: user.spotifyRefreshToken }));
+    user.spotifyAccessToken = data.access_token;
+    if (data.refresh_token) user.spotifyRefreshToken = data.refresh_token; // Spotify may rotate it
+    user.spotifyTokenExpiry = new Date(Date.now() + data.expires_in * 1000);
+    await user.save();
+  }
+  return user.spotifyAccessToken;
+};
+exports.getSpotifyAccessToken = getSpotifyAccessToken;
+
 exports.getAuthUrl = (req, res) => {
   const params = new URLSearchParams({
     response_type: 'code',
     client_id: CLIENT_ID,
-    scope: 'playlist-read-private', // only /me/playlists is used; playback is the embed iframe
+    // playlists (Focus), recently played + playlist creation (Flow Playlist). Playback itself is the embed iframe.
+    scope: 'playlist-read-private user-read-recently-played playlist-modify-private',
     redirect_uri: REDIRECT_URI,
     state: makeState(req.user.uid),
     show_dialog: true,
@@ -79,19 +94,9 @@ exports.getPlaylists = async (req, res) => {
       return res.status(401).json({ error: 'Spotify not connected' });
     }
 
-    if (user.spotifyTokenExpiry && new Date() > user.spotifyTokenExpiry) {
-      const { data } = await tokenRequest(new URLSearchParams({
-        grant_type: 'refresh_token',
-        refresh_token: user.spotifyRefreshToken,
-      }));
-      user.spotifyAccessToken = data.access_token;
-      if (data.refresh_token) user.spotifyRefreshToken = data.refresh_token; // Spotify may rotate it
-      user.spotifyTokenExpiry = new Date(Date.now() + data.expires_in * 1000);
-      await user.save();
-    }
-
+    const token = await getSpotifyAccessToken(user);
     const { data } = await axios.get('https://api.spotify.com/v1/me/playlists?limit=20', {
-      headers: { Authorization: `Bearer ${user.spotifyAccessToken}` },
+      headers: { Authorization: `Bearer ${token}` },
     });
     res.json(data.items);
   } catch (error) {

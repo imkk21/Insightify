@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useMusic } from '../context/MusicContext';
 import { motion } from 'framer-motion';
-import { X, GripHorizontal, Maximize2, Minimize2, RotateCcw } from 'lucide-react';
+import { X, GripHorizontal, Maximize2, Minimize2, RotateCcw, AudioLines } from 'lucide-react';
 
 const DEFAULT_POS = { x: 20, y: 80 };
 
@@ -10,12 +10,8 @@ const loadSaved = (key, fallback) => {
 };
 
 const IconButton = ({ label, onClick, children }) => (
-  <button
-    onClick={onClick}
-    aria-label={label}
-    title={label}
-    className="inline-flex h-7 w-7 items-center justify-center rounded-full text-olive transition-colors hover:bg-sand hover:text-plum"
-  >
+  <button onClick={onClick} aria-label={label} title={label}
+    className="inline-flex h-6 w-6 items-center justify-center rounded-sm text-subtle transition-colors hover:bg-raised hover:text-fg">
     {children}
   </button>
 );
@@ -64,29 +60,30 @@ export default function MusicFloatingPlayer() {
       onDragEnd={(e, info) => {
         localStorage.setItem('music-pos', JSON.stringify({ x: info.point.x - 160, y: info.point.y - 40 }));
       }}
-      className="fixed left-0 top-0 z-50 overflow-hidden rounded-lg bg-white shadow-overlay"
+      className="fixed left-0 top-0 z-50 overflow-hidden rounded-xl border border-line-strong bg-overlay/80 shadow-lg backdrop-blur-xl"
       style={{ width: isMinimized ? '220px' : 'min(90vw, 320px)' }}
     >
-      <div className="flex h-11 cursor-grab items-center justify-between gap-2 bg-fog px-3 active:cursor-grabbing">
+      <div className="flex h-9 cursor-grab items-center justify-between gap-2 border-b border-line px-2.5 active:cursor-grabbing">
         <div className="flex min-w-0 items-center gap-2">
-          <GripHorizontal size={16} className="shrink-0 text-silver" aria-hidden="true" />
-          <span className="truncate text-xs font-bold">
+          <GripHorizontal size={14} className="shrink-0 text-subtle" aria-hidden="true" />
+          <AudioLines size={13} className="shrink-0 text-accent-hover" aria-hidden="true" />
+          <span className="truncate text-xs font-medium text-fg">
             {isMinimized ? selectedPlaylist.name : 'Now playing'}
           </span>
         </div>
-        <div className="flex shrink-0 items-center">
-          <IconButton label="Reset position" onClick={resetPosition}><RotateCcw size={14} /></IconButton>
+        <div className="flex shrink-0 items-center gap-0.5">
+          <IconButton label="Reset position" onClick={resetPosition}><RotateCcw size={12} /></IconButton>
           <IconButton label={isMinimized ? 'Expand' : 'Minimise'} onClick={() => setIsMinimized(!isMinimized)}>
-            {isMinimized ? <Maximize2 size={14} /> : <Minimize2 size={14} />}
+            {isMinimized ? <Maximize2 size={12} /> : <Minimize2 size={12} />}
           </IconButton>
-          <IconButton label="Close player" onClick={() => setSelectedPlaylist(null)}><X size={14} /></IconButton>
+          <IconButton label="Close player" onClick={() => setSelectedPlaylist(null)}><X size={13} /></IconButton>
         </div>
       </div>
 
       {!isMinimized && (
         <div
           ref={containerRef}
-          className="overflow-hidden"
+          className="overflow-hidden p-1.5"
           style={{ resize: 'both', minWidth: '280px', minHeight: '152px', maxWidth: '600px', maxHeight: '800px', width: '100%', height: `${height}px` }}
           onMouseUp={() => containerRef.current && setHeight(containerRef.current.offsetHeight)}
         >
@@ -96,6 +93,7 @@ export default function MusicFloatingPlayer() {
             width="100%"
             height="100%"
             frameBorder="0"
+            className="rounded-lg"
             allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           />
         </div>

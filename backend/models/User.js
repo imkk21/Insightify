@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema(
     // GitHub – set when user clicks "Connect GitHub" (data fetched with the server's GITHUB_TOKEN)
     githubUsername:  { type: String, default: '' },
     githubConnected: { type: Boolean, default: false },
+    // true only after GitHub OAuth proves the user owns githubUsername (required for write actions)
+    githubVerified:  { type: Boolean, default: false },
     // Location – set from browser geolocation or manual entry
     city:            { type: String, default: '' },
     lat:             { type: Number, default: null },

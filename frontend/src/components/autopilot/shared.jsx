@@ -1,0 +1,103 @@
+import { useState } from 'react';
+import { Check, Copy } from 'lucide-react';
+
+export const errMsg = (e) => e.response?.data?.error || e.message;
+
+const SEV_BADGE = { CRITICAL: 'badge-danger', HIGH: 'badge-danger', MODERATE: 'badge-warning', LOW: 'badge-info' };
+export const SevBadge = ({ s }) => (
+  <span className={`badge ${SEV_BADGE[s] || ''} font-mono uppercase tracking-wide`}>{s === 'MODERATE' ? 'MOD' : s}</span>
+);
+
+const RISK = { high: ['badge-danger', 'High risk'], medium: ['badge-warning', 'Medium risk'], low: ['badge-success', 'Low risk'] };
+export const RiskBadge = ({ risk }) => <span className={`badge ${RISK[risk][0]}`}>{RISK[risk][1]}</span>;
+
+export function CopyButton({ text, label = 'Copy', className = 'btn-ghost btn-sm' }) {
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch { /* clipboard blocked: nothing useful to do */ }
+  };
+  return (
+    <button type="button" onClick={copy} className={className} aria-live="polite">
+      {copied ? <Check size={13} className="text-success" aria-hidden="true" /> : <Copy size={13} aria-hidden="true" />}
+      {copied ? 'Copied' : label}
+    </button>
+  );
+}
+
+/** A disabled control can't show a native tooltip in every browser, so the wrapper carries it. */
+export const Disabled = ({ reason, children }) => (
+  <span title={reason} className="inline-flex cursor-not-allowed">{children}<span className="sr-only">({reason})</span></span>
+);
+
+const DIFF_TONE = (l) => (l.startsWith('+++') || l.startsWith('---') || l.startsWith('diff ') ? 'text-subtle'
+  : l.startsWith('+') ? 'bg-success-soft text-success'
+  : l.startsWith('-') ? 'bg-danger-soft text-danger'
+  : l.startsWith('@@') ? 'text-info' : 'text-muted');
+
+export function CodeBlock({ code, lang = '', title }) {
+  const diff = lang === 'diff' || /^(diff --git|--- a\/|@@ )/m.test(code);
+  return (
+    <div className="overflow-hidden rounded-lg border border-line bg-bg">
+      <div className="flex h-8 items-center justify-between border-b border-line px-3">
+        <span className="font-mono text-2xs text-subtle">{title || lang || 'code'}</span>
+        <CopyButton text={code} className="btn-ghost h-6 px-2 text-2xs" />
+      </div>
+      <pre className="max-h-96 overflow-auto py-2 font-mono text-xs leading-5">
+        {code.replace(/\n$/, '').split('\n').map((l, i) => (
+          <div key={i} className={`whitespace-pre px-3 ${diff ? DIFF_TONE(l) : 'text-fg'}`}>{l || ' '}</div>
+        ))}
+      </pre>
+    </div>
+  );
+}
+
+// Like components/Markdown, plus `inline code` and ``` fences, which AI fix suggestions rely on.
+const INLINE = /(\*\*[^*]+\*\*|`[^`]+`|\[[^\]]+\]\(https?:\/\/[^)\s]+\))/g;
+const inline = (text) => text.split(INLINE).map((part, i) => {
+  if (/^\*\*.+\*\*$/.test(part)) return <strong key={i} className="font-semibold text-fg">{part.slice(2, -2)}</strong>;
+  if (/^`.+`$/.test(part)) return <code key={i} className="rounded-sm border border-line bg-raised px-1 py-px font-mono text-[12px] text-fg">{part.slice(1, -1)}</code>;
+  const link = part.match(/^\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)$/);
+  if (link) return <a key={i} href={link[2]} target="_blank" rel="noreferrer" className="link">{link[1]}</a>;
+  return part;
+});
+
+function Prose({ text }) {
+  const blocks = [];
+  for (const raw of text.split('\n')) {
+    const line = raw.trimEnd();
+    if (!line.trim()) continue;
+    const h = line.match(/^#{1,6}\s+(.*)/);
+    const li = line.match(/^\s*(?:[-*•]|\d+\.)\s+(.*)/);
+    const last = blocks[blocks.length - 1];
+    if (h) blocks.push({ type: 'h', text: h[1] });
+    else if (li && last?.type === 'ul') last.items.push(li[1]);
+    else if (li) blocks.push({ type: 'ul', items: [li[1]] });
+    else blocks.push({ type: 'p', text: line });
+  }
+  return blocks.map((b, i) => (b.type === 'h'
+    ? <h3 key={i} className="label pt-2 text-accent-hover first:pt-0">{inline(b.text)}</h3>
+    : b.type === 'ul'
+      ? <ul key={i} className="list-disc space-y-1.5 pl-4 marker:text-subtle">{b.items.map((t, j) => <li key={j}>{inline(t)}</li>)}</ul>
+      : <p key={i}>{inline(b.text)}</p>));
+}
+
+export function AiMarkdown({ text = '' }) {
+  // split with two groups → [prose, lang, code, prose, lang, code, …]
+  const parts = text.split(/```([\w+-]*)\n([\s\S]*?)```/g);
+  const out = [];
+  for (let i = 0; i < parts.length; i += 3) {
+    if (parts[i].trim()) out.push(<Prose key={i} text={parts[i]} />);
+    if (parts[i + 2] != null) out.push(<CodeBlock key={`c${i}`} lang={parts[i + 1]} code={parts[i + 2]} />);
+  }
+  return <div className="space-y-3 text-[13px] leading-relaxed text-muted">{out}</div>;
+}
+
+export const ModelTag = ({ model }) => (
+  <span className="badge font-mono" title={model === 'fallback-template' ? 'AI unavailable: deterministic summary' : 'Generated by AI'}>
+    {model === 'fallback-template' ? 'template' : model}
+  </span>
+);

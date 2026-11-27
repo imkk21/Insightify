@@ -72,7 +72,7 @@ const connectGithub = async (req, res) => {
     }
 
     const data = await fetchGithubData(cleanUsername); // also verifies the user exists
-    await User.findOneAndUpdate({ uid }, { githubUsername: data.username, githubConnected: true });
+    await User.findOneAndUpdate({ uid }, { githubUsername: data.username, githubConnected: true, githubVerified: false });
     res.json({ message: 'GitHub connected successfully', stats: await saveStats(uid, data) });
   } catch (err) { handleErr(err, res); }
 };
@@ -80,7 +80,7 @@ const connectGithub = async (req, res) => {
 /** DELETE /api/github/disconnect */
 const disconnectGithub = async (req, res) => {
   try {
-    await User.findOneAndUpdate({ uid: req.user.uid }, { githubUsername: '', githubConnected: false });
+    await User.findOneAndUpdate({ uid: req.user.uid }, { githubUsername: '', githubConnected: false, githubVerified: false });
     await GithubStats.deleteOne({ uid: req.user.uid });
     res.json({ message: 'GitHub disconnected successfully' });
   } catch (err) {

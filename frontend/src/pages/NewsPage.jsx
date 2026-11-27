@@ -13,8 +13,9 @@ export default function NewsPage() {
   return (
     <div>
       <PageHeader
+        eyebrow="Feed"
         title="Tech news"
-        subtitle={data ? `${articles.length} headlines · updated ${timeAgo(data.fetchedAt)}` : 'Technology headlines, refreshed hourly'}
+        subtitle={data ? `${articles.length} headlines · updated ${timeAgo(data.fetchedAt)}` : 'Technology headlines, refreshed hourly.'}
       >
         <RefreshButton onClick={refetch} loading={loading} />
       </PageHeader>
@@ -23,14 +24,14 @@ export default function NewsPage() {
 
       {loading ? (
         <Masonry cols={DENSE_COLS}>
-          {SKELETON_HEIGHTS.map((h, i) => <Skeleton key={i} className={h} />)}
+          {SKELETON_HEIGHTS.map((h, i) => <Skeleton key={i} className={`${h} rounded-xl`} />)}
         </Masonry>
       ) : articles.length ? (
         <Masonry cols={DENSE_COLS}>
           {articles.map((a) => <NewsCard key={a.url} article={a} />)}
         </Masonry>
       ) : (
-        <Card><EmptyState icon={<Newspaper size={22} />} title="No headlines right now" subtitle="Try refreshing in a few minutes." /></Card>
+        <Card><EmptyState icon={<Newspaper size={20} />} title="No headlines right now" subtitle="Try refreshing in a few minutes." /></Card>
       )}
     </div>
   );

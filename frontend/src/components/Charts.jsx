@@ -1,8 +1,8 @@
-// Small hand-rolled charts in plum tints (no chart library needed).
+// Small hand-rolled charts in accent tints (no chart library needed).
 
 const CELL = 11;
 const GAP = 3;
-const TINTS = ['#e5e5e0', 'rgba(33,25,34,0.25)', 'rgba(33,25,34,0.5)', 'rgba(33,25,34,0.75)', '#211922'];
+const TINTS = ['rgba(255,255,255,0.05)', 'rgba(124,92,255,0.3)', 'rgba(124,92,255,0.55)', 'rgba(124,92,255,0.8)', '#9d85ff'];
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 // Quartiles of the non-zero days (like GitHub), so one huge day doesn't wash everything out
@@ -39,7 +39,7 @@ export const ContributionCalendar = ({ days = [], weeks, maxScale = 1.6 }) => {
         return (
           <g key={x} transform={`translate(${x * (CELL + GAP)}, 0)`}>
             {newMonth && x < cols.length - 1 && (
-              <text y="10" fontSize="9" fill="#62625b">{MONTHS[new Date(first.date).getUTCMonth()]}</text>
+              <text y="10" fontSize="9" fill="#71717a">{MONTHS[new Date(first.date).getUTCMonth()]}</text>
             )}
             {col.map((d, y) => d && (
               <rect key={d.date} y={labelH + y * (CELL + GAP)} width={CELL} height={CELL} rx="2"
@@ -62,12 +62,12 @@ export const BarChart = ({ values, labels, labelEvery = 1, highlight, height = '
       <div className={`flex items-end gap-1 ${height}`}>
         {values.map((v, i) => (
           <div key={i} className="flex h-full flex-1 items-end" title={`${labels[i]}: ${v}`}>
-            <div className={`w-full rounded-t-[3px] ${i === highlight ? 'bg-plum' : 'bg-pebble'}`}
+            <div className={`w-full rounded-t-[3px] ${i === highlight ? 'bg-accent shadow-glow' : 'bg-line-strong'}`}
               style={{ height: `${Math.max(v ? 6 : 2, (v / max) * 100)}%` }} />
           </div>
         ))}
       </div>
-      <div className="mt-1.5 flex gap-1 text-[10px] text-olive">
+      <div className="mt-1.5 flex gap-1 font-mono text-[10px] text-subtle">
         {labels.map((l, i) => <span key={i} className="flex-1 text-center">{i % labelEvery === 0 ? l : ''}</span>)}
       </div>
     </div>

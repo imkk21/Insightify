@@ -3,10 +3,10 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useInsight } from '../hooks/useData';
 import { reportAPI } from '../services/api';
-import { PageHeader, Card, CardTitle, Masonry, DENSE_COLS, Loader, EmptyState, ErrorMsg } from '../components/UI';
+import { PageHeader, Card, CardTitle, Masonry, DENSE_COLS, Segmented, Loader, EmptyState, ErrorMsg } from '../components/UI';
 import Markdown from '../components/Markdown';
 import { timeAgo } from '../utils';
-import { FileText, Copy, Check, Send } from 'lucide-react';
+import { FileText, Copy, Check, Send, Sparkles, ArrowUp, MessageSquare } from 'lucide-react';
 
 const TYPES = [
   ['standup', 'Daily standup', 'Yesterday, today and blockers, from your last working day.'],
@@ -19,7 +19,7 @@ const QUICK_PROMPTS = [
   ['Repo strategy', 'Which of my repositories should I prioritise, and why?'],
 ];
 
-const modelNote = (m) => (m === 'fallback-template' ? 'Template (AI unavailable)' : m);
+const modelNote = (m) => (m === 'fallback-template' ? 'template · AI unavailable' : m);
 
 function ReportView({ report, slackConnected }) {
   const [copied, setCopied] = useState(false);
@@ -42,23 +42,23 @@ function ReportView({ report, slackConnected }) {
   };
 
   return (
-    <div>
-      <div className="mb-4 flex flex-wrap items-center gap-2">
-        <button onClick={copy} className="btn-secondary px-3 py-2">
-          {copied ? <Check size={16} /> : <Copy size={16} />} {copied ? 'Copied' : 'Copy Markdown'}
+    <div className="overflow-hidden rounded-lg border border-line bg-bg/60">
+      <div className="flex flex-wrap items-center gap-2 border-b border-line px-3 py-2">
+        <span className="mr-auto font-mono text-2xs text-subtle">{timeAgo(report.createdAt)} · {modelNote(report.model)}</span>
+        <button onClick={copy} className="btn-ghost btn-sm">
+          {copied ? <Check size={13} className="text-success" /> : <Copy size={13} />} {copied ? 'Copied' : 'Copy Markdown'}
         </button>
         {slackConnected ? (
-          <button onClick={send} disabled={slack.state !== 'idle'} className="btn-secondary px-3 py-2">
-            {slack.state === 'sent' ? <Check size={16} /> : <Send size={16} />}
+          <button onClick={send} disabled={slack.state !== 'idle'} className="btn-secondary btn-sm">
+            {slack.state === 'sent' ? <Check size={13} className="text-success" /> : <Send size={13} />}
             {slack.state === 'sending' ? 'Sending…' : slack.state === 'sent' ? 'Sent to Slack' : 'Send to Slack'}
           </button>
         ) : (
-          <Link to="/settings" className="btn-ghost px-3 py-2 text-olive"><Send size={16} /> Connect Slack</Link>
+          <Link to="/settings" className="btn-ghost btn-sm"><Send size={13} /> Connect Slack</Link>
         )}
-        <span className="ml-auto text-xs text-olive">{timeAgo(report.createdAt)} · {modelNote(report.model)}</span>
       </div>
-      {slack.error && <div className="mb-4"><ErrorMsg message={slack.error} /></div>}
-      <div className="rounded-sm bg-white p-5"><Markdown text={report.content} /></div>
+      {slack.error && <div className="px-4 pt-4"><ErrorMsg message={slack.error} /></div>}
+      <div className="p-5"><Markdown text={report.content} /></div>
     </div>
   );
 }
@@ -74,6 +74,8 @@ export default function ReportsPage() {
   const [prompt, setPrompt] = useState('');
   const [answer, setAnswer] = useState(null);
   const [askError, setAskError] = useState('');
+
+  const typeInfo = TYPES.find((t) => t[0] === type);
 
   const create = async () => {
     setCreating(true); setError('');
@@ -103,56 +105,66 @@ export default function ReportsPage() {
 
   return (
     <div>
-      <PageHeader title="Reports" subtitle="Standups and weekly reports, written from your commits, pull requests and tasks." />
+      <PageHeader eyebrow="Workspace" title="Reports" subtitle="Standups and weekly reports, written from your commits, pull requests and tasks." />
 
-      <div className="mb-12 grid items-start gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <Card className="rounded-xl p-6 sm:p-8">
-          <div className="mb-5 flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Report type">
-            {TYPES.map(([id, label]) => (
-              <button key={id} role="radio" aria-checked={type === id} onClick={() => { setType(id); setCurrent(null); }}
-                className={`btn px-4 py-2 ${type === id ? 'bg-plum text-white' : 'bg-white text-plum hover:bg-sand'}`}>
-                {label}
-              </button>
-            ))}
+      <div className="mb-10 grid items-start gap-4 xl:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <Card>
+          <div className="mb-5 flex flex-wrap items-center gap-3">
+            <Segmented label="Report type" options={TYPES.map(([id, label]) => [id, label])} value={type}
+              onChange={(v) => { setType(v); setCurrent(null); }} />
             <button onClick={create} disabled={creating} className="btn-primary ml-auto">
-              {creating ? 'Writing…' : `Generate ${TYPES.find((t) => t[0] === type)[1].toLowerCase()}`}
+              <Sparkles size={14} aria-hidden="true" />
+              {creating ? 'Writing…' : `Generate ${typeInfo[1].toLowerCase()}`}
             </button>
           </div>
           {error && <div className="mb-4"><ErrorMsg message={error} /></div>}
           {creating ? <Loader label="Reading your activity…" />
             : current ? <ReportView key={current._id} report={current} slackConnected={profile?.slackConnected} />
-            : <EmptyState icon={<FileText size={22} />} title={TYPES.find((t) => t[0] === type)[1]} subtitle={TYPES.find((t) => t[0] === type)[2]} />}
+            : (
+              <div className="rounded-lg border border-dashed border-line-strong">
+                <EmptyState icon={<FileText size={20} />} title={typeInfo[1]} subtitle={typeInfo[2]} />
+              </div>
+            )}
         </Card>
 
-        <Card className="rounded-xl p-6 sm:p-8">
-          <CardTitle title="Ask about your work" subtitle="Answers use your own GitHub activity and tasks" />
-          <div className="mb-4 flex flex-wrap gap-2">
+        <Card>
+          <CardTitle icon={<MessageSquare size={14} />} title="Ask about your work" subtitle="Answers use your own GitHub activity and tasks" />
+          <div className="mb-3 flex flex-wrap gap-1.5">
             {QUICK_PROMPTS.map(([label, text]) => (
-              <button key={label} onClick={() => { setPrompt(text); ask(text); }} disabled={generating} className="btn-secondary px-3 py-2 text-xs">
+              <button key={label} onClick={() => { setPrompt(text); ask(text); }} disabled={generating}
+                className="btn-secondary btn-sm rounded-full">
                 {label}
               </button>
             ))}
           </div>
-          <form onSubmit={(e) => { e.preventDefault(); ask(); }} className="flex flex-col gap-2">
+          <form onSubmit={(e) => { e.preventDefault(); ask(); }}
+            className="relative rounded-lg border border-line-strong bg-raised transition-colors focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/30">
             <label htmlFor="ask" className="sr-only">Your question</label>
             <textarea id="ask" value={prompt} maxLength={2000} onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}
-              placeholder="Ask anything… (Enter to send)" className="input h-24 resize-none" />
-            <button type="submit" disabled={generating || !prompt.trim()} className="btn-primary self-end">Ask</button>
+              placeholder="Ask anything about your work…"
+              className="block h-24 w-full resize-none bg-transparent px-3 py-2.5 text-[13px] text-fg placeholder:text-subtle focus:outline-none" />
+            <div className="flex items-center justify-between px-3 pb-2.5">
+              <span className="text-2xs text-subtle"><span className="kbd">Enter</span> to send · <span className="kbd">Shift</span>+<span className="kbd">Enter</span> newline</span>
+              <button type="submit" disabled={generating || !prompt.trim()} className="btn-primary btn-sm w-7 px-0" aria-label="Ask"><ArrowUp size={14} /></button>
+            </div>
           </form>
           {generating && <Loader label="Thinking…" />}
           {askError && <div className="mt-4"><ErrorMsg message={askError} /></div>}
           {answer && !generating && (
-            <div className="mt-4 rounded-sm bg-white p-4">
-              <div className="mb-1 text-xs font-bold text-olive">{modelNote(answer.model)}</div>
-              <p className="whitespace-pre-wrap text-sm leading-relaxed">{answer.content}</p>
+            <div className="mt-4 rounded-lg border border-line bg-bg/60 p-4">
+              <div className="mb-2 flex items-center gap-1.5 font-mono text-2xs text-subtle"><Sparkles size={11} className="text-accent-hover" /> {modelNote(answer.model)}</div>
+              <p className="whitespace-pre-wrap text-[13px] leading-6 text-fg">{answer.content}</p>
             </div>
           )}
         </Card>
       </div>
 
       <section>
-        <h2 className="mb-4 font-bold">History</h2>
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2 className="text-[15px] font-semibold">History</h2>
+          {history.length > 0 && <span className="font-mono text-xs text-subtle">{history.length} items</span>}
+        </div>
         {history.length ? (
           <Masonry cols={DENSE_COLS}>
             {history.map((item) => {
@@ -164,20 +176,20 @@ export default function ReportsPage() {
                     onClick: () => open(item),
                     onKeyDown: (e) => (e.key === 'Enter' || e.key === ' ') && (e.preventDefault(), open(item)),
                   })}
-                  className={isReport ? 'cursor-pointer hover:bg-sand' : ''}>
-                  <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-olive">
-                    <span className={`badge ${isReport ? 'bg-plum text-white' : ''}`}>{LABELS[item.type]}</span>
-                    <span>{timeAgo(item.createdAt)}</span>
+                  className={isReport ? 'card-hover cursor-pointer' : ''}>
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <span className={`badge ${isReport ? 'badge-accent' : ''}`}>{LABELS[item.type]}</span>
+                    <span className="font-mono text-2xs text-subtle">{timeAgo(item.createdAt)}</span>
                   </div>
-                  {item.type === 'custom' && item.prompt && <p className="mb-2 text-sm font-bold">{item.prompt}</p>}
+                  {item.type === 'custom' && item.prompt && <p className="mb-2 text-[13px] font-medium text-fg">{item.prompt}</p>}
                   {isReport
                     ? <div className="max-h-56 overflow-hidden [mask-image:linear-gradient(to_bottom,black_70%,transparent)]"><Markdown text={item.content} /></div>
-                    : <p className="line-clamp-[8] text-sm text-olive">{item.content}</p>}
+                    : <p className="line-clamp-[8] text-[13px] text-muted">{item.content}</p>}
                 </Card>
               );
             })}
           </Masonry>
-        ) : <Card><EmptyState icon={<FileText size={22} />} title="Nothing here yet" subtitle="Reports, insights and answers collect here." /></Card>}
+        ) : <Card><EmptyState icon={<FileText size={20} />} title="Nothing here yet" subtitle="Reports, insights and answers collect here." /></Card>}
       </section>
     </div>
   );

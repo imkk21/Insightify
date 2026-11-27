@@ -1,45 +1,52 @@
 import { useState } from 'react';
+import { ArrowUpRight } from 'lucide-react';
 import { timeAgo } from '../utils';
 
-// Image-first "pin": the photo keeps its natural height, which is what makes the masonry work.
+const Meta = ({ article }) => (
+  <div className="flex items-center gap-1.5 font-mono text-2xs text-subtle">
+    <span className="truncate text-muted">{article.source}</span>
+    <span aria-hidden="true">·</span>
+    <span className="shrink-0">{timeAgo(article.publishedAt)}</span>
+  </div>
+);
+
+// Image-first card: the photo keeps its natural height, which is what makes the masonry work.
 // `compact` is a small thumbnail row for supporting spots like the Today page.
 export default function NewsCard({ article, compact = false }) {
   const [imageOk, setImageOk] = useState(!!article.urlToImage);
 
   if (compact) {
     return (
-      <a href={article.url} target="_blank" rel="noreferrer" className="group flex gap-3">
+      <a href={article.url} target="_blank" rel="noreferrer"
+        className="group -mx-2 flex gap-3 rounded-md p-2 transition-colors hover:bg-raised">
         {imageOk && (
           <img src={article.urlToImage} alt="" loading="lazy" onError={() => setImageOk(false)}
-            className="h-16 w-16 shrink-0 rounded-sm bg-sand object-cover" />
+            className="h-14 w-14 shrink-0 rounded-md bg-raised object-cover ring-1 ring-line" />
         )}
         <div className="min-w-0">
-          <div className="text-xs font-bold text-olive">{article.source} · {timeAgo(article.publishedAt)}</div>
-          <h3 className="mt-0.5 line-clamp-2 text-sm font-semibold leading-snug group-hover:underline">{article.title}</h3>
+          <Meta article={article} />
+          <h3 className="mt-1 line-clamp-2 text-[13px] font-medium leading-snug text-fg">{article.title}</h3>
         </div>
       </a>
     );
   }
 
   return (
-    <a href={article.url} target="_blank" rel="noreferrer" className="group block">
+    <a href={article.url} target="_blank" rel="noreferrer"
+      className="card card-hover group block overflow-hidden p-0">
       {imageOk && (
-        <img
-          src={article.urlToImage}
-          alt=""
-          loading="lazy"
-          onError={() => setImageOk(false)}
-          className="w-full rounded-lg bg-sand object-cover transition-opacity group-hover:opacity-90"
-        />
-      )}
-      <div className={imageOk ? 'px-1 pt-2.5' : 'card'}>
-        <div className="text-xs font-bold text-olive">
-          {article.source} · {timeAgo(article.publishedAt)}
+        <div className="overflow-hidden border-b border-line bg-raised">
+          <img src={article.urlToImage} alt="" loading="lazy" onError={() => setImageOk(false)}
+            className="w-full object-cover opacity-90 transition duration-300 group-hover:scale-[1.02] group-hover:opacity-100" />
         </div>
-        <h3 className="mt-1 font-semibold leading-snug group-hover:underline">{article.title}</h3>
-        {article.description && (
-          <p className="mt-1 line-clamp-3 text-sm text-olive">{article.description}</p>
-        )}
+      )}
+      <div className="p-4">
+        <Meta article={article} />
+        <h3 className="mt-2 font-medium leading-snug text-fg">
+          {article.title}
+          <ArrowUpRight size={14} className="ml-1 inline text-subtle opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true" />
+        </h3>
+        {article.description && <p className="mt-1.5 line-clamp-3 text-[13px] text-muted">{article.description}</p>}
       </div>
     </a>
   );
