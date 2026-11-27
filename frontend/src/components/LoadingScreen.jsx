@@ -1,6 +1,6 @@
 export default function LoadingScreen() {
   return (
-    <div className="fixed inset-0 bg-cream flex flex-col items-center justify-center z-50">
+    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50">
       <div className="mb-6">
         <span className="font-syne font-black text-3xl text-ink tracking-tight">
           Insightify<span className="text-amber">.</span>

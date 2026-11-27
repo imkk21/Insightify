@@ -1,36 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useMusic } from '../context/MusicContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, GripHorizontal, Maximize2, Minimize2, ExternalLink, RotateCcw } from 'lucide-react';
+import { X, GripHorizontal, Maximize2, Minimize2, RotateCcw } from 'lucide-react';
+
+const loadSaved = (key, fallback) => {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; }
+};
 
 export default function MusicFloatingPlayer() {
   const { selectedPlaylist, setSelectedPlaylist } = useMusic();
   const [isMinimized, setIsMinimized] = useState(false);
-  const [size, setSize] = useState({ w: 320, h: 152 });
-  const [hasMounted, setHasMounted] = useState(false);
+  const [height, setHeight] = useState(() => loadSaved('music-size', {}).h ?? 152);
+  const [safePos, setSafePos] = useState(() => loadSaved('music-pos', { x: 20, y: 80 }));
   const containerRef = useRef(null);
 
-  // Viewport Boundary Safety state
-  const [safePos, setSafePos] = useState({ x: 20, y: 80 });
-
   useEffect(() => {
-    setHasMounted(true);
-    
-    // Load persisted data safely on mount
-    const savedPos = localStorage.getItem('music-pos');
-    const savedSize = localStorage.getItem('music-size');
-    if (savedPos) setSafePos(JSON.parse(savedPos));
-    if (savedSize) setSize(JSON.parse(savedSize));
-  }, []);
+    localStorage.setItem('music-size', JSON.stringify({ h: height }));
+  }, [height]);
 
+  // Snap back on screen if the saved position is outside the current viewport
   useEffect(() => {
-    if (hasMounted && !isMinimized) {
-      localStorage.setItem('music-size', JSON.stringify(size));
-    }
-  }, [size, isMinimized, hasMounted]);
-
-  useEffect(() => {
-    if (!hasMounted) return;
     const checkVisibility = () => {
       const maxX = window.innerWidth - 320;
       const maxY = window.innerHeight - 100;
@@ -41,17 +30,15 @@ export default function MusicFloatingPlayer() {
     checkVisibility();
     window.addEventListener('resize', checkVisibility);
     return () => window.removeEventListener('resize', checkVisibility);
-  }, [safePos.x, safePos.y, hasMounted]);
+  }, [safePos.x, safePos.y]);
 
-  if (!hasMounted || !selectedPlaylist) return null;
-
-  const win = typeof window !== 'undefined' ? window : { innerWidth: 1200, innerHeight: 800 };
+  if (!selectedPlaylist) return null;
 
   return (
     <AnimatePresence>
       <motion.div
         drag
-        dragConstraints={{ left: 0, right: win.innerWidth - 300, top: 0, bottom: win.innerHeight - 100 }}
+        dragConstraints={{ left: 0, right: window.innerWidth - 300, top: 0, bottom: window.innerHeight - 100 }}
         dragElastic={0.1}
         dragMomentum={false}
         initial={{ opacity: 0, scale: 0.9, x: safePos.x, y: safePos.y }}
@@ -65,7 +52,7 @@ export default function MusicFloatingPlayer() {
           height: isMinimized ? '44px' : 'auto', 
           left: 0,
           top: 0,
-          scale: win.innerWidth < 640 ? 0.85 : 1
+          scale: window.innerWidth < 640 ? 0.85 : 1
         }}
       >
         {/* Neural Drag Handle */}
@@ -108,16 +95,9 @@ export default function MusicFloatingPlayer() {
                  maxWidth: '600px', 
                  maxHeight: '800px',
                  width: '100%',
-                 height: `${size.h}px`
+                 height: `${height}px`
                }}
-               onMouseUp={(e) => {
-                 if (containerRef.current) {
-                   setSize({ 
-                     w: containerRef.current.offsetWidth, 
-                     h: containerRef.current.offsetHeight 
-                   });
-                 }
-               }}
+               onMouseUp={() => containerRef.current && setHeight(containerRef.current.offsetHeight)}
              >
                <iframe 
                 src={`https://open.spotify.com/embed/playlist/${selectedPlaylist.id}?utm_source=generator&theme=0`} 

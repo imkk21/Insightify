@@ -2,30 +2,17 @@
 
 # Insightify.
 
-### AI-Powered Personalized Developer Insight Platform (Neural Evolution)
+### AI-Powered Personalized Developer Insight Platform
 
 [![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](https://react.dev)
 [![Node.js](https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org)
-[![Spotify](https://img.shields.io/badge/Spotify-API-1DB954?style=flat-square&logo=spotify&logoColor=white)](https://developer.spotify.com)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth-FFCA28?style=flat-square&logo=firebase&logoColor=black)](https://firebase.google.com)
 [![Gemini](https://img.shields.io/badge/Google-Gemini_AI-4285F4?style=flat-square&logo=google&logoColor=white)](https://ai.google.dev)
 [![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=flat-square&logo=vite&logoColor=white)](https://vitejs.dev)
 
-> A high-fidelity developer dashboard aggregating GitHub activity, live weather, and tech news — now featuring **Sonic Flow** (Spotify Integration) and a **Floating Neural Player**.
-
-![Insightify Dashboard](https://i.imgur.com/placeholder.png)
+A developer dashboard that combines your GitHub activity, local weather and tech news, and turns them into a weekly AI-written insight.
 
 </div>
-
----
-
-## 📌 Recent Updates (Neural Restoration)
-
-Insightify has been upgraded to its **Modern Design Language**, prioritizing data density and professional aesthetics:
-- **Classic Glassmorphism**: Sharper corners (`1.5rem`), higher contrast, and frosted glass effects.
-- **Sonic Flow Integration**: Native Spotify playback synchronized with your coding environments.
-- **Floating Neural Player**: A draggable, resizable, and persistent PiP music player.
-- **Enhanced Data Density**: Restored GitHub Language Vectors and expanded Atmospheric sensor data.
 
 ---
 
@@ -33,49 +20,45 @@ Insightify has been upgraded to its **Modern Design Language**, prioritizing dat
 
 | Feature | Description |
 |---|---|
-| 🔐 **Google OAuth** | Secure biometric/social sign-in via Firebase |
-| 🔗 **GitHub Intelligence** | Deep-dive analytics for repos, commits, and language architecture |
-| 🎼 **Sonic Flow (Spotify)** | Link Spotify to stream "Concentration Environments" directly in-app |
-| 🛸 **Floating Player** | Draggable and resizable music interface that persists across all pages |
-| 📊 **Productivity Pulse** | Real-time neural efficiency gauges and commit heatmaps |
-| 🤖 **AI Weekly Insight** | Personalized Gemini AI analysis of your code, weather, and news |
-| 📍 **Atmospheric Sensors** | Real-time weather, wind vectors, and visibility via OpenWeather |
-| 📰 **Global News Stream** | Hourly technology headlines delivered via Neural Comm Stream |
+| 🔐 **Google sign-in** | Firebase Authentication; every API call is verified server-side with Firebase Admin |
+| 🔗 **GitHub analytics** | Repos, stars, forks, language breakdown, your recent commits and a productivity score |
+| 🤖 **AI insights** | Weekly Gemini summary of your GitHub, weather and news data, plus free-form questions |
+| 🧑‍💻 **Code assistant** | Paste a snippet, get a Gemini refactor with explanation |
+| 🌤️ **Weather** | Current conditions and 5-day forecast from OpenWeather, using browser location |
+| 📰 **Tech news** | Technology headlines from NewsAPI, refreshed hourly |
+| 🎵 **Music** | Connect Spotify, pick a playlist, and play it in a draggable floating player |
+| ✅ **Tasks** | Simple three-column task board |
 
 ---
 
 ## 🛠 Tech Stack
 
-### Frontend
-- **React 18** (Vite 5)
-- **Framer Motion** (Neural animations & draggable UI)
-- **Tailwind CSS** (Modern Glassmorphism system)
-- **Lucide React** (Consistent iconography)
-- **Spotify Web SDK** (Playback integration)
+**Frontend** — React 18, Vite 5, Tailwind CSS, Framer Motion, Recharts, Lucide icons, Firebase Auth SDK. Deployed on Vercel.
 
-### Backend
-- **Node.js + Express**
-- **MongoDB Atlas** (Persistent neural records)
-- **Google Gemini 1.5 Flash** (AI core)
-- **Node-Cron** (Scheduled brain cycles)
+**Backend** — Node.js, Express, MongoDB Atlas (Mongoose), Firebase Admin, Google Gemini (`@google/generative-ai`), node-cron. Deployed on Render.
 
 ---
 
-## 📁 Project Structure (New Components)
+## 📁 Project Structure
 
 ```
 insightify/
-├── frontend/src/
-│   ├── components/
-│   │   ├── MusicFloatingPlayer.jsx  # Draggable Neural interface
-│   │   ├── InsightBanner.jsx        # Gemini AI hero
-│   │   └── UI.jsx                   # Standardized components
-│   ├── context/
-│   │   ├── AuthContext.jsx
-│   │   └── MusicContext.jsx         # Spotify Global State
-│   └── pages/
-│       ├── DashboardPage.jsx        # High-density Bento grid
-│       └── DeepWorkPage.jsx         # Sonic Flow environment hub
+├── backend/
+│   ├── config/        # MongoDB + Firebase Admin setup
+│   ├── controllers/   # Route handlers
+│   ├── jobs/          # Cron: hourly news, weekly insights (Mon 08:00 IST)
+│   ├── middleware/    # Firebase token verification
+│   ├── models/        # Mongoose schemas
+│   ├── routes/
+│   ├── services/      # GitHub, OpenWeather, NewsAPI, Gemini clients
+│   └── server.js
+└── frontend/
+    └── src/
+        ├── components/  # Layout, UI kit, floating music player, …
+        ├── context/     # Auth + Spotify state
+        ├── hooks/       # Data hooks (useGithub, useWeather, …)
+        ├── pages/
+        └── services/    # Axios API client, Firebase init
 ```
 
 ---
@@ -83,47 +66,46 @@ insightify/
 ## 🚀 Getting Started
 
 ### Prerequisites
-- **Node.js** >= 18.0.0
-- **Spotify Developer App** (Client ID & Secret)
-- **Google Gemini API Key**
-- **Firebase Auth Project**
+- Node.js 18+
+- Accounts/keys for: MongoDB Atlas, Firebase (web app + service account), GitHub token, OpenWeather, NewsAPI, Google Gemini, Spotify Developer app
 
-### Quick Install
-1. **Clone & Install**: `npm install` in both folders.
-2. **Environment**: Set `VITE_SPOTIFY_CLIENT_ID` and `GEMINI_API_KEY`.
-3. **Launch**: `npm run dev` in both.
+### Setup
+```bash
+# 1. Install
+cd backend  && npm install
+cd ../frontend && npm install
 
----
+# 2. Environment: copy the examples and fill in your keys
+cp backend/.env.example  backend/.env
+cp frontend/.env.example frontend/.env
 
-## 💡 Design Philosophy
+# 3. Run (two terminals)
+cd backend  && npm run dev     # http://localhost:5000/api/health
+cd frontend && npm run dev     # http://localhost:5173
+```
 
-Insightify moves away from "bulky" UI trends in favor of a **High-Density Information Interface**. By reducing border-radii to `1.5rem` and emphasizing a "Frosted Glass" grid, the platform provides more data-per-pixel for power users while maintaining a premium, futuristic look.
+Each variable is documented in [`backend/.env.example`](backend/.env.example) and [`frontend/.env.example`](frontend/.env.example).
+For Spotify, add your `SPOTIFY_REDIRECT_URI` to the app's Redirect URIs in the Spotify dashboard.
+Cron jobs only run when `NODE_ENV` is not `development`.
 
 ---
 
 ## 🚀 Future Scope
 
-- **IDE Integration**: Developing a VS Code extension to bring neural insights and concentration controls directly into the coding environment.
-- **Biometric Synchronization**: Correlating focus sessions with heart-rate variability (HRV) from wearables (Apple Watch/Fitbit) to identify physiological peak performance windows.
-- **Team Intelligence**: Collaborative dashboards for engineering leads to monitor overall team momentum and health without micro-management.
-- **Automated Summarization**: AI-driven pull request summaries and documentation generation based on weekly commit patterns.
-- **Mobile Native Application**: Dedicated iOS/Android app featuring push notifications for "Peak Focus" alerts and atmospheric warnings.
+- **IDE integration**: a VS Code extension bringing insights into the editor.
+- **Team dashboards**: aggregate momentum across an engineering team.
+- **Automated summaries**: AI pull-request and changelog summaries from weekly commits.
+- **Mobile app**: push notifications for weekly insights.
 
 ---
 
 ## 👤 Author
 
-**Kunal Kumar**  
-Full Stack Developer · Udaipur, Rajasthan, India  
+**Kunal Kumar**
+Full Stack Developer · Udaipur, Rajasthan, India
 
 ---
 
 ## 📄 License
 
-```
 MIT License — Copyright (c) 2026 Kunal Kumar
-```
-
-<div align="center">
-Built with ❤️ for the Next Generation of Developers
-</div>

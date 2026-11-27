@@ -1,11 +1,10 @@
-import { useState, useEffect } from 'react';
 import { PageHeader, Card, CardHeader, CardBody, DotLoader, EmptyState } from '../components/UI';
 import { spotifyAPI } from '../services/api';
 import { Music, ExternalLink, Headphones } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMusic } from '../context/MusicContext';
 
-export default function DeepWorkPage() {
+export default function MusicPage() {
   const { 
     selectedPlaylist, 
     setSelectedPlaylist, 

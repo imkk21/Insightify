@@ -17,24 +17,12 @@ connectDB();
 // Init Firebase Admin
 initFirebase();
 
-// Middleware
-// Always allow localhost:5173 for dev. FRONTEND_URL must be a valid URL,
-// not an API key — validate it defensively.
+// CORS: local Vite dev server + production frontend
 const allowedOrigins = [
-  'http://localhost:5173', 
-  'http://localhost:5174', 
-  'https://insightifyweb.vercel.app'
+  'http://localhost:5173',
+  'https://insightifyweb.vercel.app',
 ];
-app.use(cors({
-  origin: (origin, cb) => {
-    // Allow no-origin requests (Postman, curl, same-origin)
-    if (!origin) return cb(null, true);
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    console.warn(`CORS blocked: ${origin}`);
-    cb(new Error(`CORS not allowed for origin: ${origin}`));
-  },
-  credentials: true,
-}));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -54,7 +42,6 @@ app.use('/api/news',    require('./routes/newsRoutes'));
 app.use('/api/insight', require('./routes/insightRoutes'));
 app.use('/api/user',    require('./routes/userRoutes'));
 app.use('/api/tasks',   require('./routes/taskRoutes'));
-app.use('/api/focus',   require('./routes/focusRoutes'));
 app.use('/api/spotify', require('./routes/spotifyRoutes'));
 
 // Health check

@@ -5,8 +5,8 @@ import {
   LangBar, SyncButton, DotLoader, EmptyState, ErrorMsg
 } from '../components/UI';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { PALETTE } from '../utils';
 
-const LANG_COLORS = ['#e8a030','#4361b8','#14b8a6','#e05a6a','#6b6258'];
 
 function ConnectGithubPanel({ onConnect, loading }) {
   const [username,   setUsername]   = useState('');
@@ -18,7 +18,7 @@ function ConnectGithubPanel({ onConnect, loading }) {
     if (!uname) { setError('Please enter your GitHub username.'); return; }
     setError(''); setConnecting(true);
     try {
-      await onConnect(uname, '');
+      await onConnect(uname);
     } catch (e) {
       setError(e.message);
     } finally {
@@ -167,7 +167,7 @@ export default function GithubPage() {
                 {loading ? <DotLoader label="Fetching languages…" /> : langs.length ? (
                   <div className="space-y-4">
                     {langs.map(([lang, count], i) => (
-                      <LangBar key={lang} name={lang} pct={Math.round((count / total) * 100)} color={LANG_COLORS[i]} />
+                      <LangBar key={lang} name={lang} pct={Math.round((count / total) * 100)} color={PALETTE[i]} />
                     ))}
                   </div>
                 ) : <EmptyState emoji="💻" title="No language data" />}
@@ -200,10 +200,10 @@ export default function GithubPage() {
                 <div>
                   {data.topRepos.map((repo, i) => (
                     <a key={i} href={repo.url} target="_blank" rel="noreferrer"
-                      className="flex items-start justify-between px-6 py-4 border-b border-black/[0.05] last:border-b-0 hover:bg-cream/50 transition-colors no-underline group"
+                      className="flex items-start justify-between px-6 py-4 border-b border-black/[0.05] last:border-b-0 hover:bg-foreground/5 transition-colors no-underline group"
                     >
                       <div className="flex-1 min-w-0 mr-4">
-                        <div className="font-syne font-semibold text-sm text-ink group-hover:text-teal transition-colors">{repo.name}</div>
+                        <div className="font-syne font-semibold text-sm text-ink group-hover:text-teal2 transition-colors">{repo.name}</div>
                         <div className="text-xs text-ink3 mt-0.5 truncate">{repo.description || 'No description'}</div>
                         <div className="flex gap-2 mt-2">
                           {repo.language && (

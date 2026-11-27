@@ -1,11 +1,12 @@
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 
+// Google retires model versions; override with GEMINI_MODEL instead of editing code.
+const MODEL_NAME = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+
 const getModel = () => {
   const key = process.env.GEMINI_API_KEY;
   if (!key || key === 'your_gemini_api_key') return null;
-  const genAI = new GoogleGenerativeAI(key);
-  // Using gemini-2.0-flash based on API availability (June 2025 stable release)
-  return genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  return new GoogleGenerativeAI(key).getGenerativeModel({ model: MODEL_NAME });
 };
 
 const buildPrompt = ({ github, weather, news, customPrompt }) => {
@@ -65,7 +66,7 @@ const generateInsight = async ({ github, weather, news, customPrompt }) => {
       const result = await model.generateContent(prompt);
       const text = result.response.text();
       if (text && text.trim().length > 20) {
-        return { content: text.trim(), model: 'gemini-1.5-flash', prompt };
+        return { content: text.trim(), model: MODEL_NAME, prompt };
       }
     } catch (err) {
       console.error('Gemini failed:', err.message);
@@ -85,4 +86,4 @@ const generateInsight = async ({ github, weather, news, customPrompt }) => {
   return { content: fallback, model: 'fallback-template', prompt };
 };
 
-module.exports = { generateInsight, buildPrompt };
+module.exports = { generateInsight, getModel };

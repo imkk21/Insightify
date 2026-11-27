@@ -1,5 +1,5 @@
 import { useNews } from '../hooks/useData';
-import { PageHeader, Card, CardHeader, SyncButton, DotLoader, EmptyState, ErrorMsg } from '../components/UI';
+import { PageHeader, SyncButton, EmptyState, ErrorMsg } from '../components/UI';
 import NewsCard from '../components/NewsCard';
 
 export default function NewsPage() {

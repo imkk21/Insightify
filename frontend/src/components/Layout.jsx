@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useMusic } from '../context/MusicContext';
-import { Sun, Moon, LayoutDashboard, GitBranch, CloudRain, Newspaper, Bot, Activity, Settings, LogOut, Music as MusicIcon, ListTodo, Zap, Headphones, X } from 'lucide-react';
+import { Sun, Moon, LayoutDashboard, GitBranch, CloudRain, Newspaper, Bot, Activity, Settings, LogOut, Music as MusicIcon, ListTodo, Zap, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import MusicFloatingPlayer from './MusicFloatingPlayer';
 
@@ -11,7 +10,7 @@ const navItems = [
   { label: 'GitHub Stats',to: '/github', icon: <GitBranch size={18} /> },
   { label: 'Weather',     to: '/weather', icon: <CloudRain size={18} /> },
   { label: 'Tech News',   to: '/news', icon: <Newspaper size={18} /> },
-  { label: 'Music',        to: '/focus', icon: <MusicIcon size={18} /> },
+  { label: 'Music',        to: '/music', icon: <MusicIcon size={18} /> },
   { label: 'Tasks',        to: '/tasks', icon: <ListTodo size={18} /> },
   { label: 'AI Assistant', to: '/assistant', icon: <Zap size={18} /> },
   { label: 'AI Insights', to: '/insight', icon: <Bot size={18} /> },
@@ -21,7 +20,6 @@ const navItems = [
 
 export default function Layout() {
   const { user, profile, logout } = useAuth();
-  const { selectedPlaylist, setSelectedPlaylist } = useMusic();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
@@ -69,6 +67,7 @@ export default function Layout() {
           <div className="text-[10px] font-mono text-ink3/40 tracking-[3px] uppercase px-4 pb-4">Primary Systems</div>
           {navItems.slice(0, 7).map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end}
+              onClick={() => setMobileMenuOpen(false)}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
               {item.icon} <span className="tracking-tight">{item.label}</span>
             </NavLink>
@@ -76,6 +75,7 @@ export default function Layout() {
           <div className="text-[10px] font-mono text-ink3/40 tracking-[3px] uppercase px-4 pb-4 pt-8">Neural Analytics</div>
           {navItems.slice(7).map((item) => (
             <NavLink key={item.to} to={item.to}
+              onClick={() => setMobileMenuOpen(false)}
               className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
               {item.icon} <span className="tracking-tight">{item.label}</span>
             </NavLink>

@@ -1,10 +1,18 @@
 import { useState, useEffect } from 'react';
-import { PageHeader, Card, CardHeader, CardBody, DotLoader } from '../components/UI';
+import { PageHeader, Card, CardHeader, CardBody } from '../components/UI';
 import { insightAPI } from '../services/api';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import javascript from 'react-syntax-highlighter/dist/esm/languages/prism/javascript';
+import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
+import java from 'react-syntax-highlighter/dist/esm/languages/prism/java';
+import cpp from 'react-syntax-highlighter/dist/esm/languages/prism/cpp';
+import go from 'react-syntax-highlighter/dist/esm/languages/prism/go';
 import { vscDarkPlus, prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { Code2, Zap, Copy, RefreshCw, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+// Light build: only bundle the languages the picker offers (full Prism added ~1 MB)
+Object.entries({ javascript, python, java, cpp, go }).forEach(([n, l]) => SyntaxHighlighter.registerLanguage(n, l));
 
 const LANGUAGES = [
   { id: 'javascript', name: 'JavaScript' },
@@ -56,7 +64,7 @@ export default function CodeAssistantPage() {
     <div className="max-w-6xl mx-auto space-y-8 pb-20">
       <PageHeader 
         title="AI Engineering Sandbox" 
-        subtitle="Intelligent refactoring with Google Gemini 2.0 Flash." 
+        subtitle="Intelligent refactoring with Google Gemini." 
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useInsight } from '../hooks/useData';
 import { PageHeader, Card, CardHeader, CardBody, DotLoader, EmptyState, ErrorMsg } from '../components/UI';
+import { timeAgo } from '../utils';
 
 const QUICK_PROMPTS = [
   { label: '📊 Weekly Summary',  text: 'Summarize my GitHub activity this week and what I should focus on next.' },
@@ -10,14 +11,6 @@ const QUICK_PROMPTS = [
   { label: '⭐ Repo Strategy',   text: 'Which of my repositories should I prioritize to maximize community engagement?' },
   { label: '🎯 Next Sprint',     text: 'Based on my activity, what should my development goals be for the next sprint?' },
 ];
-
-const timeAgo = (date) => {
-  if (!date) return '';
-  const diff = (Date.now() - new Date(date)) / 1000;
-  if (diff < 3600)  return `${Math.round(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.round(diff / 3600)}h ago`;
-  return `${Math.round(diff / 86400)}d ago`;
-};
 
 export default function InsightPage() {
   const { latest, history, loading, error, generating, generate, askCustom } = useInsight();
@@ -103,7 +96,7 @@ export default function InsightPage() {
           {customLoading && <div className="mt-4"><DotLoader label="Insightify AI is thinking…" /></div>}
           {customError  && <div className="mt-4"><ErrorMsg message={customError} /></div>}
           {customResult && !customLoading && (
-            <div className="mt-4 p-4 bg-cream rounded-xl border-l-4 border-amber animate-fade-up">
+            <div className="mt-4 p-4 bg-foreground/5 rounded-xl border-l-4 border-amber animate-fade-up">
               <div className="text-[10px] font-mono text-amber uppercase tracking-[2px] mb-2">AI Response · {customResult.model}</div>
               <p className="text-ink2 text-[14px] leading-relaxed whitespace-pre-wrap">{customResult.content}</p>
             </div>

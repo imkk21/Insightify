@@ -1,10 +1,4 @@
-const timeAgo = (date) => {
-  if (!date) return '';
-  const diff = (Date.now() - new Date(date)) / 1000;
-  if (diff < 3600)  return `${Math.round(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.round(diff / 3600)}h ago`;
-  return `${Math.round(diff / 86400)}d ago`;
-};
+import { timeAgo } from '../utils';
 
 export default function NewsCard({ article, compact = false }) {
   if (compact) {
@@ -13,12 +7,12 @@ export default function NewsCard({ article, compact = false }) {
         href={article.url}
         target="_blank"
         rel="noreferrer"
-        className="block px-6 py-4 border-b border-black/[0.05] hover:bg-cream/60 transition-colors last:border-b-0 no-underline group"
+        className="block px-6 py-4 border-b border-black/[0.05] hover:bg-foreground/5 transition-colors last:border-b-0 no-underline group"
       >
-        <div className="text-[10px] font-mono text-teal uppercase tracking-[1.5px] mb-1">
+        <div className="text-[10px] font-mono text-teal2 uppercase tracking-[1.5px] mb-1">
           {article.source}
         </div>
-        <div className="text-[13px] text-ink2 leading-snug group-hover:text-teal transition-colors">
+        <div className="text-[13px] text-ink2 leading-snug group-hover:text-teal2 transition-colors">
           {article.title}
         </div>
         <div className="text-[11px] text-ink3 mt-1">{timeAgo(article.publishedAt)}</div>
@@ -41,10 +35,10 @@ export default function NewsCard({ article, compact = false }) {
           onError={(e) => { e.target.style.display = 'none'; }}
         />
       )}
-      <div className="text-[10px] font-mono text-teal uppercase tracking-[1.5px] mb-2">
+      <div className="text-[10px] font-mono text-teal2 uppercase tracking-[1.5px] mb-2">
         {article.source}
       </div>
-      <div className="font-syne font-semibold text-[14px] text-ink leading-snug group-hover:text-teal transition-colors mb-2">
+      <div className="font-syne font-semibold text-[14px] text-ink leading-snug group-hover:text-teal2 transition-colors mb-2">
         {article.title}
       </div>
       {article.description && (

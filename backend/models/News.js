@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 
+// One shared document (_id 'global'): headlines are the same for every user.
 const newsSchema = new mongoose.Schema(
   {
-    uid: { type: String, required: true, index: true },
+    _id: { type: String, default: 'global' },
     articles: [
       {
         title:       String,

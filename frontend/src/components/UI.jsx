@@ -122,7 +122,7 @@ export const DotLoader = ({ label = 'Synchronizing…' }) => (
 
 // ── Error message ────────────────────────────────────────────────────
 export const ErrorMsg = ({ message }) => (
-  <div className="text-rose text-[11px] font-mono uppercase tracking-widest bg-rose/5 border border-rose/20 rounded-xl px-6 py-4 flex items-center gap-3 backdrop-blur-xl animate-shake">
+  <div className="text-rose text-[11px] font-mono uppercase tracking-widest bg-rose/5 border border-rose/20 rounded-xl px-6 py-4 flex items-center gap-3 backdrop-blur-xl">
     <span className="text-lg">⚠</span> {message || 'Terminal connection failure'}
   </div>
 );

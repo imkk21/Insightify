@@ -1,22 +1,14 @@
 import { useAuth } from '../context/AuthContext';
 import { useMusic } from '../context/MusicContext';
 import { useNavigate } from 'react-router-dom';
-import { useGithub, useWeather, useNews, useInsight, useFocus, useTasks } from '../hooks/useData';
+import { useGithub, useWeather, useNews, useInsight, useTasks } from '../hooks/useData';
 import { PageHeader, Card, CardHeader, CardBody, LangBar, DateChip, SyncButton, Skeleton, DotLoader, EmptyState } from '../components/UI';
 import InsightBanner from '../components/InsightBanner';
 import NewsCard from '../components/NewsCard';
 import { motion } from 'framer-motion';
-import { Activity, GitCommit, Headphones, Music, Zap } from 'lucide-react';
+import { GitCommit, Music, Zap } from 'lucide-react';
+import { timeAgo, PALETTE } from '../utils';
 
-const LANG_COLORS = ['#e8a030','#4361b8','#14b8a6','#e05a6a','#6b6258'];
-const DOT_COLORS  = ['#e8a030','#14b8a6','#4361b8','#e05a6a','#6b6258'];
-
-const timeAgo = (date) => {
-  const diff = (Date.now() - new Date(date)) / 1000;
-  if (diff < 3600)  return `${Math.round(diff / 60)}m ago`;
-  if (diff < 86400) return `${Math.round(diff / 3600)}h ago`;
-  return `${Math.round(diff / 86400)}d ago`;
-};
 
 const ProductivityGauge = ({ score }) => {
   const normalizedScore = score || 0;
@@ -52,22 +44,19 @@ const ProductivityGauge = ({ score }) => {
 
 export default function DashboardPage() {
   const { user, profile } = useAuth();
-  const { selectedPlaylist, spotifyConnected } = useMusic();
+  const { selectedPlaylist } = useMusic();
   const navigate = useNavigate();
   const github  = useGithub();
   const weather = useWeather();
   const news    = useNews();
   const insight = useInsight();
-  const focus   = useFocus();
   const taskData = useTasks();
-111
   const name = profile?.displayName || user?.displayName || user?.name || 'Developer';
   const hour = new Date().getHours();
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   const isGithubConnected = !!github.data?.username;
 
-  const focusHours = (focus.data?.weeklyMinutes / 60).toFixed(1);
   const pendingTasks = taskData.tasks?.filter(t => t.status !== 'done').length || 0;
 
   const langs = github.data?.languages
@@ -118,11 +107,7 @@ export default function DashboardPage() {
                   
                   <div className="mt-8 grid grid-cols-1 gap-3 w-full">
                     <div className="flex justify-between items-center bg-background/40 backdrop-blur-xl rounded-2xl p-4 border border-border shadow-inner">
-                      <div className="text-[10px] uppercase font-mono text-ink3 tracking-widest">Focus Yield</div>
-                      <div className="text-2xl font-bold text-foreground tracking-tight">{focusHours}h</div>
-                    </div>
-                    <div className="flex justify-between items-center bg-background/40 backdrop-blur-xl rounded-2xl p-4 border border-border shadow-inner">
-                      <div className="text-[10px] uppercase font-mono text-ink3 tracking-widest">Active Nodes</div>
+                      <div className="text-[10px] uppercase font-mono text-ink3 tracking-widest">Open Tasks</div>
                       <div className="text-2xl font-bold text-amber tracking-tight">{pendingTasks}</div>
                     </div>
                   </div>
@@ -159,7 +144,7 @@ export default function DashboardPage() {
                   </div>
                 )}
                 <button 
-                  onClick={() => navigate('/focus')}
+                  onClick={() => navigate('/music')}
                   className="mt-6 w-full py-3 rounded-xl bg-foreground/5 hover:bg-foreground/10 border border-border text-[10px] font-mono font-bold uppercase tracking-widest transition-all"
                 >
                   Manage Sonic Flow
@@ -174,7 +159,7 @@ export default function DashboardPage() {
                 {github.loading ? <DotLoader /> : langs.length ? (
                   <div className="space-y-5">
                     {langs.map(([name, val], i) => (
-                      <LangBar key={name} name={name} pct={Math.round((val / total) * 100)} color={LANG_COLORS[i % 5]} />
+                      <LangBar key={name} name={name} pct={Math.round((val / total) * 100)} color={PALETTE[i % 5]} />
                     ))}
                   </div>
                 ) : <EmptyState emoji="🧩" title="No language data" />}
@@ -207,7 +192,7 @@ export default function DashboardPage() {
                     </div>
                     <div className="flex flex-col justify-center">
                       <div className="text-[10px] font-mono text-ink3 uppercase tracking-widest mb-1">Visibility</div>
-                      <div className="text-xl font-bold text-foreground">{(c.visibility / 1000).toFixed(1)} km</div>
+                      <div className="text-xl font-bold text-foreground">{c.visibility} km</div>
                     </div>
                   </div>
                 </div>
@@ -233,12 +218,12 @@ export default function DashboardPage() {
                       className="flex items-start gap-4 px-6 py-5 rounded-3xl hover:bg-white/5 border border-transparent hover:border-white/10 transition-all no-underline group"
                     >
                       <div className="w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 bg-background/50 border border-border shadow-sm group-hover:scale-110 transition-transform shadow-inner">
-                        <GitCommit size={16} className="opacity-80" style={{ color: DOT_COLORS[i % 5] }} />
+                        <GitCommit size={16} className="opacity-80" style={{ color: PALETTE[i % 5] }} />
                       </div>
                       <div className="flex-1 min-w-0 pt-1">
                         <div className="text-base font-bold text-foreground leading-snug group-hover:text-amber transition-colors truncate tracking-tight">{c.message}</div>
                         <div className="text-[10px] text-ink3 font-mono mt-3 uppercase tracking-widest opacity-60">
-                           {c.repo.split('/')[1]} · {c.sha.slice(0,7)} · {timeAgo(c.date)}
+                           {c.repo} · {c.sha} · {timeAgo(c.date)}
                         </div>
                       </div>
                     </a>
