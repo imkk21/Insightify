@@ -8,6 +8,7 @@ const { getLatestNews } = require('../services/newsService');
 const { generateInsight } = require('../services/insightService');
 const { saveStats } = require('../controllers/githubController');
 const { createReport, sendReportToSlack } = require('../controllers/reportController');
+const { runScan } = require('../controllers/securityController');
 
 /**
  * Sync GitHub + weather for every GitHub-connected user, then generate a weekly insight.
@@ -83,6 +84,19 @@ const slackReportJob = (type) => async () => {
   }
 };
 
+/** Weekly dependency scan for every GitHub-connected user. */
+const securityScanJob = async () => {
+  const users = await User.find({ githubUsername: { $ne: '' } });
+  for (const user of users) {
+    try {
+      const scan = await runScan(user.uid, user.githubUsername);
+      console.log(`[CRON] Security scan ${user.email}: ${scan.totals.findings} findings`);
+    } catch (err) {
+      console.error(`[CRON] Security scan failed for ${user.email}:`, err.message);
+    }
+  }
+};
+
 const startCronJobs = () => {
   // Local dev shares the production database: never run scheduled writes from it
   if (process.env.NODE_ENV === 'development') {
@@ -91,9 +105,10 @@ const startCronJobs = () => {
   }
   cron.schedule('0 8 * * 1', weeklyInsightJob, { timezone: 'Asia/Kolkata' });
   cron.schedule('0 * * * *', hourlyNewsJob, { timezone: 'Asia/Kolkata' });
+  cron.schedule('30 7 * * 1', securityScanJob, { timezone: 'Asia/Kolkata' });
   cron.schedule('0 9 * * 1-5', slackReportJob('standup'), { timezone: 'Asia/Kolkata' });
   cron.schedule('30 9 * * 1', slackReportJob('report'), { timezone: 'Asia/Kolkata' });
   console.log('⏰ Cron jobs scheduled (Insights Mon 08:00 | Standups Mon–Fri 09:00 | Weekly report Mon 09:30 IST | News hourly)');
 };
 
-module.exports = { startCronJobs, weeklyInsightJob, hourlyNewsJob, slackReportJob };
+module.exports = { startCronJobs, weeklyInsightJob, hourlyNewsJob, slackReportJob, securityScanJob };

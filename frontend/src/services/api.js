@@ -49,6 +49,12 @@ export const reportAPI = {
   sendToSlack: (id)   => api.post(`/reports/${id}/slack`),
 };
 
+export const securityAPI = {
+  get:     () => api.get('/security'),
+  summary: () => api.get('/security/summary'),
+  scan:    () => api.post('/security/scan', null, { timeout: 120000 }), // ~30s for 15 repos
+};
+
 export const spotifyAPI = {
   getLoginUrl: () => api.get('/spotify/login'),
   getStatus:   () => api.get('/spotify/status'),

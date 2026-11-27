@@ -1,14 +1,15 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useMusic } from '../context/MusicContext';
 import { useGithub, useNews, useInsight, useTasks } from '../hooks/useData';
+import { securityAPI } from '../services/api';
 import { Card, CardTitle, Loader, EmptyState, Skeleton } from '../components/UI';
 import { ContributionCalendar } from '../components/Charts';
 import InsightBanner from '../components/InsightBanner';
 import NewsCard from '../components/NewsCard';
 import { timeAgo } from '../utils';
-import { GitCommit, GitPullRequest, GitBranch, Music, Circle, Clock, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { GitCommit, GitPullRequest, GitBranch, Music, Circle, Clock, ArrowUpRight, ArrowDownRight, ShieldAlert } from 'lucide-react';
 
 const LinkMore = ({ to, children = 'View all' }) => <Link to={to} className="link shrink-0 text-sm">{children}</Link>;
 
@@ -132,6 +133,25 @@ function NowPlaying() {
   );
 }
 
+/** Only shown when the last scan found critical/high issues: quiet otherwise. */
+function SecurityStrip() {
+  const [summary, setSummary] = useState(null);
+  useEffect(() => { securityAPI.summary().then(({ data }) => setSummary(data)).catch(() => {}); }, []);
+  const sev = summary?.totals?.bySeverity;
+  const urgent = (sev?.CRITICAL || 0) + (sev?.HIGH || 0);
+  if (!urgent) return null;
+  return (
+    <Link to="/security" className="mb-4 flex items-center gap-3 rounded-lg bg-error/10 px-5 py-4 text-error hover:bg-error/15">
+      <ShieldAlert size={20} className="shrink-0" aria-hidden="true" />
+      <span className="font-semibold">
+        {sev.CRITICAL ? `${sev.CRITICAL} critical` : ''}{sev.CRITICAL && sev.HIGH ? ' and ' : ''}{sev.HIGH ? `${sev.HIGH} high-severity` : ''} vulnerable
+        {urgent === 1 ? ' package' : ' packages'} in your repositories
+      </span>
+      <span className="ml-auto shrink-0 text-sm font-semibold underline">Review</span>
+    </Link>
+  );
+}
+
 export default function DashboardPage() {
   const { user, profile } = useAuth();
   const github  = useGithub();
@@ -149,6 +169,8 @@ export default function DashboardPage() {
         <p className="font-semibold text-olive">{today}</p>
         <h1 className="mt-1 text-4xl font-bold tracking-tight sm:text-5xl">{greeting}, {name}</h1>
       </section>
+
+      <SecurityStrip />
 
       <div className="mb-4 grid items-stretch gap-4 xl:grid-cols-3">
         <ThisWeek github={github} />

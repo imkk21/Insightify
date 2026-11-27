@@ -44,6 +44,7 @@ app.use('/api/user',    require('./routes/userRoutes'));
 app.use('/api/tasks',   require('./routes/taskRoutes'));
 app.use('/api/spotify', require('./routes/spotifyRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
+app.use('/api/security', require('./routes/securityRoutes'));
 
 // Health check
 app.get('/api/health', (_req, res) =>
