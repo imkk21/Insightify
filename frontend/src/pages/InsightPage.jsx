@@ -1,134 +1,98 @@
 import { useState } from 'react';
 import { useInsight } from '../hooks/useData';
-import { PageHeader, Card, CardHeader, CardBody, DotLoader, EmptyState, ErrorMsg } from '../components/UI';
+import { PageHeader, Card, CardTitle, Masonry, DENSE_COLS, Loader, Skeleton, EmptyState, ErrorMsg } from '../components/UI';
+import InsightBanner from '../components/InsightBanner';
 import { timeAgo } from '../utils';
+import { Sparkles } from 'lucide-react';
 
 const QUICK_PROMPTS = [
-  { label: '📊 Weekly Summary',  text: 'Summarize my GitHub activity this week and what I should focus on next.' },
-  { label: '🚀 Tech Trends',     text: 'Given my tech stack, what trending tools should I learn this quarter?' },
-  { label: '📰 News Digest',     text: 'What are the top tech headlines and how do they relate to my stack?' },
-  { label: '🌤️ Weather & Work',  text: 'How should the weather forecast affect my work schedule and productivity?' },
-  { label: '⭐ Repo Strategy',   text: 'Which of my repositories should I prioritize to maximize community engagement?' },
-  { label: '🎯 Next Sprint',     text: 'Based on my activity, what should my development goals be for the next sprint?' },
+  ['Weekly summary', 'Summarize my GitHub activity this week and what I should focus on next.'],
+  ['Tech trends',    'Given my tech stack, what trending tools should I learn this quarter?'],
+  ['News digest',    'What are the top tech headlines and how do they relate to my stack?'],
+  ['Weather & work', 'How should the weather forecast affect my work schedule and productivity?'],
+  ['Repo strategy',  'Which of my repositories should I prioritize to maximize community engagement?'],
+  ['Next sprint',    'Based on my activity, what should my development goals be for the next sprint?'],
 ];
 
 export default function InsightPage() {
   const { latest, history, loading, error, generating, generate, askCustom } = useInsight();
-  const [prompt,        setPrompt]       = useState('');
-  const [customResult,  setCustomResult] = useState(null);
-  const [customError,   setCustomError]  = useState('');
-  const [customLoading, setCustomLoading]= useState(false);
+  const [prompt, setPrompt] = useState('');
+  const [answer, setAnswer] = useState(null);
+  const [askError, setAskError] = useState('');
+  const [asking, setAsking] = useState(false);
 
-  const handleCustom = async (text) => {
-    const p = (text || prompt).trim();
+  const ask = async (text) => {
+    const p = (text ?? prompt).trim();
     if (!p) return;
-    setCustomError(''); setCustomResult(null); setCustomLoading(true);
-    try {
-      const res = await askCustom(p);
-      setCustomResult(res);
-    } catch (e) { setCustomError(e.message); }
-    finally { setCustomLoading(false); }
+    setAskError(''); setAnswer(null); setAsking(true);
+    try { setAnswer(await askCustom(p)); }
+    catch (e) { setAskError(e.message); }
+    finally { setAsking(false); }
   };
 
   return (
     <div>
-      <PageHeader title="AI Insights" subtitle="Powered by Google Gemini · Your personalized developer intelligence">
-        <button onClick={generate} disabled={generating} className="btn-primary flex items-center gap-2">
-          {generating
-            ? <><svg className="w-3.5 h-3.5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Generating…</>
-            : '✦ Generate Weekly Insight'}
-        </button>
-      </PageHeader>
+      <PageHeader title="Insights" subtitle="Gemini reads your GitHub activity, weather and tech news" />
 
-      {error && <div className="mb-5"><ErrorMsg message={error} /></div>}
+      {error && <div className="mb-6"><ErrorMsg message={error} /></div>}
 
-      {/* Latest insight */}
-      <Card className="mb-5">
-        <CardHeader title="Latest Weekly Insight" subtitle="AI-generated from your GitHub, Weather & News data" badge="✦ Gemini" badgeStyle="bg-rose/10 text-rose border-rose/20" />
-        <CardBody>
-          {loading ? <DotLoader label="Loading insight…" />
-            : latest ? (
-              <div>
-                <p className="text-ink2 leading-relaxed text-[15px]">{latest.content}</p>
-                <div className="flex flex-wrap gap-3 mt-5 pt-5 border-t border-black/[0.06]">
-                  <span className="text-xs font-mono text-ink3">Generated {timeAgo(latest.createdAt)}</span>
-                  <span className="text-xs font-mono text-ink3">Model: {latest.model}</span>
-                  {latest.dataSnapshot?.commits != null && <span className="text-xs font-mono text-ink3">Commits: {latest.dataSnapshot.commits}</span>}
-                  {latest.dataSnapshot?.city      && <span className="text-xs font-mono text-ink3">📍 {latest.dataSnapshot.city} {latest.dataSnapshot.temp}°C</span>}
-                  <button onClick={generate} disabled={generating} className="ml-auto text-[11px] font-mono text-ink3 hover:text-amber transition-colors disabled:opacity-40">
-                    {generating ? '⟳ Generating…' : '↺ Regenerate'}
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <EmptyState emoji="✨" title="No insight yet" subtitle="Click 'Generate Weekly Insight' to create your first AI-powered summary" />
-                <div className="text-center mt-4">
-                  <button onClick={generate} disabled={generating} className="btn-primary mx-auto">
-                    {generating ? 'Generating…' : '✦ Generate Now'}
-                  </button>
-                </div>
-              </div>
-            )}
-        </CardBody>
-      </Card>
+      <div className="mb-10 grid items-start gap-4 xl:grid-cols-2">
+        {loading ? <Skeleton className="h-64 rounded-xl" /> : <InsightBanner insight={latest} onGenerate={generate} generating={generating} />}
 
-      {/* Custom AI chat */}
-      <Card className="mb-5">
-        <CardHeader title="Ask Insightify AI" subtitle="Ask anything about your data" badge="✦ Gemini" badgeStyle="bg-amber/10 text-amber border-amber/20" />
-        <CardBody>
-          <div className="flex flex-wrap gap-2 mb-4">
-            {QUICK_PROMPTS.map(({ label, text }) => (
-              <button key={label} onClick={() => handleCustom(text)} disabled={customLoading || generating}
-                className="btn-outline text-xs py-1.5">{label}</button>
+        <Card className="rounded-xl p-6 sm:p-8">
+          <CardTitle title="Ask about your week" subtitle="Answers use your own GitHub, weather and news data" />
+          <div className="mb-4 flex flex-wrap gap-2">
+            {QUICK_PROMPTS.map(([label, text]) => (
+              <button key={label} onClick={() => { setPrompt(text); ask(text); }} disabled={asking} className="btn-secondary px-3 py-2 text-xs">
+                {label}
+              </button>
             ))}
           </div>
-          <div className="flex gap-3">
+          <form onSubmit={(e) => { e.preventDefault(); ask(); }} className="flex flex-col gap-2 sm:flex-row sm:items-end">
+            <label htmlFor="ask" className="sr-only">Your question</label>
             <textarea
+              id="ask"
               value={prompt}
+              maxLength={2000}
               onChange={(e) => setPrompt(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleCustom(); }}}
-              placeholder="Ask about your developer data… (Enter to send, Shift+Enter for newline)"
-              className="input flex-1 resize-none h-20"
+              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); ask(); } }}
+              placeholder="Ask anything… (Enter to send, Shift+Enter for a new line)"
+              className="input h-24 resize-none"
             />
-            <button onClick={() => handleCustom()} disabled={customLoading || !prompt.trim()} className="btn-primary self-end">Ask AI</button>
-          </div>
-          {customLoading && <div className="mt-4"><DotLoader label="Insightify AI is thinking…" /></div>}
-          {customError  && <div className="mt-4"><ErrorMsg message={customError} /></div>}
-          {customResult && !customLoading && (
-            <div className="mt-4 p-4 bg-foreground/5 rounded-xl border-l-4 border-amber animate-fade-up">
-              <div className="text-[10px] font-mono text-amber uppercase tracking-[2px] mb-2">AI Response · {customResult.model}</div>
-              <p className="text-ink2 text-[14px] leading-relaxed whitespace-pre-wrap">{customResult.content}</p>
+            <button type="submit" disabled={asking || !prompt.trim()} className="btn-primary">Ask</button>
+          </form>
+          {asking && <Loader label="Thinking…" />}
+          {askError && <div className="mt-4"><ErrorMsg message={askError} /></div>}
+          {answer && !asking && (
+            <div className="mt-4 rounded-sm bg-white p-4">
+              <div className="mb-1 text-xs font-bold text-olive">{answer.model === 'fallback-template' ? 'Template answer (AI unavailable)' : answer.model}</div>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed">{answer.content}</p>
             </div>
           )}
-        </CardBody>
-      </Card>
+        </Card>
+      </div>
 
-      {/* History */}
-      <Card>
-        <CardHeader title="Insight History" subtitle={`${history.length} insights generated`} />
-        <CardBody className="!p-0">
-          {history.length ? history.map((item, i) => (
-            <div key={i} className="px-6 py-5 border-b border-black/[0.05] last:border-b-0">
-              <div className="flex items-center gap-3 mb-2 flex-wrap">
-                <span className={`badge text-[10px] font-mono ${item.type === 'weekly' ? 'bg-teal2/10 text-teal2 border-teal2/20' : 'bg-amber/10 text-amber border-amber/20'}`}>
-                  {item.type === 'weekly' ? 'Weekly' : 'Custom'}
-                </span>
-                <span className="text-[11px] font-mono text-ink3">{timeAgo(item.createdAt)}</span>
-                <span className="text-[11px] font-mono text-ink3">{item.model}</span>
-                {item.dataSnapshot?.city && (
-                  <span className="text-[11px] font-mono text-ink3">📍 {item.dataSnapshot.city}</span>
-                )}
-              </div>
-              <p className="text-sm text-ink2 leading-relaxed line-clamp-3">{item.content}</p>
-            </div>
-          )) : (
-            <div className="px-6 py-4">
-              <EmptyState emoji="📜" title="No history yet" subtitle="Generated insights will appear here" />
-            </div>
-          )}
-        </CardBody>
-      </Card>
+      <section>
+        <h2 className="mb-4 font-bold">History</h2>
+        {history.length ? (
+          <Masonry cols={DENSE_COLS}>
+            {history.map((item) => (
+              <Card key={item._id}>
+                <div className="mb-2 flex flex-wrap items-center gap-2 text-xs text-olive">
+                  <span className={`badge ${item.type === 'weekly' ? 'bg-plum text-white' : ''}`}>
+                    {item.type === 'weekly' ? 'Weekly' : 'Question'}
+                  </span>
+                  <span>{timeAgo(item.createdAt)}</span>
+                </div>
+                {item.type === 'custom' && item.prompt && <p className="mb-2 text-sm font-bold">{item.prompt}</p>}
+                <p className="line-clamp-[10] text-sm text-olive">{item.content}</p>
+              </Card>
+            ))}
+          </Masonry>
+        ) : (
+          <Card><EmptyState icon={<Sparkles size={22} />} title="No insights yet" subtitle="Generated insights and answers will collect here." /></Card>
+        )}
+      </section>
     </div>
   );
 }

@@ -1,6 +1,10 @@
 import { useNews } from '../hooks/useData';
-import { PageHeader, SyncButton, EmptyState, ErrorMsg } from '../components/UI';
+import { PageHeader, Card, Masonry, DENSE_COLS, Skeleton, EmptyState, ErrorMsg, RefreshButton } from '../components/UI';
 import NewsCard from '../components/NewsCard';
+import { timeAgo } from '../utils';
+import { Newspaper } from 'lucide-react';
+
+const SKELETON_HEIGHTS = ['h-64', 'h-48', 'h-80', 'h-56', 'h-72', 'h-52', 'h-60', 'h-44'];
 
 export default function NewsPage() {
   const { data, loading, error, refetch } = useNews();
@@ -8,44 +12,25 @@ export default function NewsPage() {
 
   return (
     <div>
-      <PageHeader title="Tech News Feed" subtitle={`${articles.length} articles · Updated hourly via News API`}>
-        <SyncButton onClick={refetch} loading={loading} />
+      <PageHeader
+        title="Tech news"
+        subtitle={data ? `${articles.length} headlines · updated ${timeAgo(data.fetchedAt)}` : 'Technology headlines, refreshed hourly'}
+      >
+        <RefreshButton onClick={refetch} loading={loading} />
       </PageHeader>
 
-      {error && <div className="mb-5"><ErrorMsg message={error} /></div>}
+      {error && <div className="mb-6"><ErrorMsg message={error} /></div>}
 
       {loading ? (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-          {Array(6).fill(0).map((_, i) => (
-            <div key={i} className="card p-5 animate-pulse">
-              <div className="bg-black/[0.06] rounded-xl h-36 mb-4" />
-              <div className="bg-black/[0.06] rounded h-3 w-1/3 mb-3" />
-              <div className="bg-black/[0.06] rounded h-4 mb-2" />
-              <div className="bg-black/[0.06] rounded h-4 w-3/4" />
-            </div>
-          ))}
-        </div>
+        <Masonry cols={DENSE_COLS}>
+          {SKELETON_HEIGHTS.map((h, i) => <Skeleton key={i} className={h} />)}
+        </Masonry>
       ) : articles.length ? (
-        <>
-          {/* Featured */}
-          <div className="mb-5">
-            <h2 className="text-xs font-mono text-ink3 uppercase tracking-[2px] mb-4">Featured</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-              {articles.slice(0, 2).map((a, i) => <NewsCard key={i} article={a} />)}
-            </div>
-          </div>
-          {/* Rest */}
-          <div>
-            <h2 className="text-xs font-mono text-ink3 uppercase tracking-[2px] mb-4">All Articles</h2>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-              {articles.slice(2).map((a, i) => <NewsCard key={i} article={a} />)}
-            </div>
-          </div>
-        </>
+        <Masonry cols={DENSE_COLS}>
+          {articles.map((a) => <NewsCard key={a.url} article={a} />)}
+        </Masonry>
       ) : (
-        <div className="card">
-          <EmptyState emoji="📰" title="No news articles" subtitle="Sync to fetch the latest tech headlines from News API" />
-        </div>
+        <Card><EmptyState icon={<Newspaper size={22} />} title="No headlines right now" subtitle="Try refreshing in a few minutes." /></Card>
       )}
     </div>
   );

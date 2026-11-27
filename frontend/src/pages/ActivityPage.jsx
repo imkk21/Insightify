@@ -1,137 +1,96 @@
+import { Link } from 'react-router-dom';
 import CalendarHeatmap from 'react-calendar-heatmap';
 import 'react-calendar-heatmap/dist/styles.css';
 import { useGithub } from '../hooks/useData';
-import { PageHeader, Card, CardHeader, CardBody, SyncButton, DotLoader, EmptyState } from '../components/UI';
-import { motion } from 'framer-motion';
-import { GitCommit } from 'lucide-react';
-import { timeAgo, PALETTE } from '../utils';
+import { PageHeader, Card, CardTitle, Stat, Loader, EmptyState, RefreshButton } from '../components/UI';
+import { timeAgo } from '../utils';
+import { GitCommit, GitBranch } from 'lucide-react';
 
-
-function GithubHeatmap({ commits }) {
+function Heatmap({ commits = [] }) {
   const counts = {};
-  commits?.forEach(c => {
+  commits.forEach((c) => {
     const d = new Date(c.date).toISOString().split('T')[0];
     counts[d] = (counts[d] || 0) + 1;
   });
-
-  const values = Object.entries(counts).map(([date, count]) => ({ date, count }));
-  
-  const endDate = new Date();
-  const startDate = new Date();
-  startDate.setMonth(startDate.getMonth() - 6);
+  const start = new Date();
+  start.setMonth(start.getMonth() - 6);
 
   return (
-    <div className="w-full overflow-x-auto p-4">
-      <div className="min-w-[700px]">
+    <div className="overflow-x-auto">
+      {/* The SVG scales with its container; cap it so cells and labels stay small */}
+      <div className="min-w-[640px] max-w-[880px]">
         <CalendarHeatmap
-          startDate={startDate}
-          endDate={endDate}
-          values={values}
-          classForValue={(value) => {
-            if (!value || value.count === 0) return 'color-empty';
-            return `color-scale-${Math.min(value.count, 4)}`;
-          }}
-          showWeekdayLabels={true}
+          startDate={start}
+          endDate={new Date()}
+          values={Object.entries(counts).map(([date, count]) => ({ date, count }))}
+          classForValue={(v) => (v?.count ? `color-scale-${Math.min(v.count, 4)}` : 'color-empty')}
+          titleForValue={(v) => (v?.count ? `${v.count} commit${v.count > 1 ? 's' : ''} on ${v.date}` : null)}
+          showWeekdayLabels
         />
       </div>
-      <style>{`
-        .react-calendar-heatmap text { font-size: 10px; fill: var(--ink3); font-family: 'JetBrains Mono'; }
-        .react-calendar-heatmap .color-empty   { fill: var(--background); stroke: var(--border); stroke-width: 1px; }
-        .react-calendar-heatmap .color-scale-1 { fill: rgba(232,160,48,0.25); }
-        .react-calendar-heatmap .color-scale-2 { fill: rgba(232,160,48,0.5); }
-        .react-calendar-heatmap .color-scale-3 { fill: rgba(232,160,48,0.75); }
-        .react-calendar-heatmap .color-scale-4 { fill: #e8a030; }
-        .react-calendar-heatmap rect { rx: 3; ry: 3; }
-        .react-calendar-heatmap rect:hover { stroke: #e8a030; stroke-width: 1px; transition: 0.2s }
-      `}</style>
     </div>
   );
 }
 
 export default function ActivityPage() {
   const { data, loading, sync } = useGithub();
-  const isConnected = !!data?.username;
+  const connected = !!data?.username;
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: { opacity: 1, transition: { staggerChildren: 0.1 } }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { ease: "easeOut", duration: 0.4 } }
-  };
+  if (!loading && !connected) {
+    return (
+      <div>
+        <PageHeader title="Activity" subtitle="Your commits over time" />
+        <Card className="mx-auto max-w-lg rounded-xl">
+          <EmptyState icon={<GitBranch size={22} />} title="Connect GitHub first" subtitle="Your commit history shows up here once GitHub is connected.">
+            <Link to="/github" className="btn-primary">Connect GitHub</Link>
+          </EmptyState>
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <motion.div variants={containerVariants} initial="hidden" animate="show">
-      <PageHeader title="Activity Feed" subtitle="Commits, contributions & system status">
-        {isConnected && <SyncButton onClick={sync} loading={loading} />}
+    <div>
+      <PageHeader title="Activity" subtitle="Your commits over time">
+        {connected && <RefreshButton onClick={sync} loading={loading} />}
       </PageHeader>
 
-      <motion.div variants={itemVariants}>
-        <Card className="mb-6 overflow-hidden">
-          <CardHeader title="Contribution Heatmap" subtitle="Your recent commits (latest 5 per repo, 5 most recently updated repos)" />
-          <CardBody className="bg-card backdrop-blur-md">
-            {isConnected ? <GithubHeatmap commits={data?.recentCommits} /> : <EmptyState emoji="🔗" title="Connect GitHub to see telemetry map" subtitle="Go to GitHub Stats page to connect" />}
-          </CardBody>
-        </Card>
-      </motion.div>
+      {loading && !connected ? <Loader /> : (
+        <>
+          <Card className="mb-8">
+            <CardTitle title="Commit calendar" subtitle="Your latest commits from your 5 most recently updated repositories" />
+            <Heatmap commits={data.recentCommits} />
+          </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <motion.div variants={itemVariants}>
-          <Card className="h-full">
-            <CardHeader title="Recent Commits" subtitle="Latest system activity" badge="GitHub" badgeStyle="bg-amber/10 text-amber border-amber/20" />
-            <div className="p-2">
-              {loading ? (
-                <div className="px-6 py-4"><DotLoader label="Loading commits…" /></div>
-              ) : !isConnected ? (
-                <div className="px-6 py-4"><EmptyState emoji="🔗" title="Connect GitHub to see commits" /></div>
-              ) : data?.recentCommits?.length ? (
-                <div>
-                  {data.recentCommits.map((c, i) => (
-                    <a key={i} href={c.url} target="_blank" rel="noreferrer"
-                      className="flex items-start gap-4 px-6 py-4 rounded-2xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors no-underline group"
-                    >
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 bg-background border border-border shadow-sm group-hover:scale-110 transition-transform">
-                        <GitCommit size={14} style={{ color: PALETTE[i % 5] }} />
-                      </div>
-                      <div className="min-w-0 pt-1">
-                        <div className="text-[14px] font-medium text-foreground leading-snug group-hover:text-amber transition-colors truncate">{c.message}</div>
-                        <div className="text-xs text-ink3 font-mono mt-2">{c.repo} · {c.sha} · {timeAgo(c.date)}</div>
-                      </div>
-                    </a>
+          <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+            <Card>
+              <CardTitle title="Recent commits" />
+              {data.recentCommits?.length ? (
+                <ul>
+                  {data.recentCommits.map((c) => (
+                    <li key={c.sha + c.repo} className="border-t border-sand first:border-0">
+                      <a href={c.url} target="_blank" rel="noreferrer" className="group flex items-start gap-3 py-3">
+                        <span className="btn-circle h-8 w-8"><GitCommit size={16} aria-hidden="true" /></span>
+                        <span className="min-w-0 pt-0.5">
+                          <span className="block truncate font-semibold group-hover:underline">{c.message}</span>
+                          <span className="block text-xs text-olive">{c.repo} · {c.sha} · {timeAgo(c.date)}</span>
+                        </span>
+                      </a>
+                    </li>
                   ))}
-                </div>
-              ) : (
-                <div className="px-6 py-4"><EmptyState emoji="📝" title="No commits found" /></div>
-              )}
-            </div>
-          </Card>
-        </motion.div>
+                </ul>
+              ) : <EmptyState title="No commits found" />}
+            </Card>
 
-        <motion.div variants={itemVariants}>
-          <Card className="h-full">
-            <CardHeader title="GitHub Summary" subtitle="From your last sync" />
-            <CardBody>
-              {isConnected ? (
-                <div className="grid grid-cols-2 gap-4">
-                    {[
-                      { label: 'Weekly Commits', value: data?.weeklyCommits },
-                      { label: 'Total Repos',    value: data?.totalRepos },
-                      { label: 'Total Stars',    value: data?.totalStars },
-                      { label: 'Followers',      value: data?.followers },
-                    ].map(({ label, value }) => (
-                      <div key={label} className="bg-card backdrop-blur-md rounded-2xl p-4 shadow-sm border border-border">
-                        <div className="text-[10px] text-ink3 uppercase tracking-wide font-mono">{label}</div>
-                        <div className="font-syne font-black text-2xl text-foreground mt-1">{value ?? '—'}</div>
-                      </div>
-                    ))}
-                </div>
-              ) : <EmptyState emoji="🔗" title="Connect GitHub to see your stats" />}
-            </CardBody>
-          </Card>
-        </motion.div>
-      </div>
-    </motion.div>
+            <div className="grid grid-cols-2 gap-4">
+              <Stat label="Commits this week" value={data.weeklyCommits} />
+              <Stat label="Productivity score" value={data.productivityScore} hint="out of 100" />
+              <Stat label="Repositories" value={data.totalRepos} />
+              <Stat label="Stars" value={data.totalStars} />
+            </div>
+          </div>
+        </>
+      )}
+    </div>
   );
 }

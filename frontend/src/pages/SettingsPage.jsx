@@ -1,28 +1,32 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { userAPI } from '../services/api';
-import { PageHeader, Card, CardHeader, CardBody, ErrorMsg } from '../components/UI';
+import { PageHeader, Card, CardTitle, ErrorMsg } from '../components/UI';
+import { MapPin, LogOut } from 'lucide-react';
+import { initials } from '../utils';
 
 export default function SettingsPage() {
-  const { user, profile, refreshProfile } = useAuth();
-  const [form,    setForm]    = useState({ city: '', displayName: '' });
-  const [saving,  setSaving]  = useState(false);
-  const [saved,   setSaved]   = useState(false);
-  const [error,   setError]   = useState('');
-  const [locating,setLocating]= useState(false);
+  const { user, profile, refreshProfile, logout } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({ city: '', displayName: '' });
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+  const [locating, setLocating] = useState(false);
 
   useEffect(() => {
-    if (profile) {
-      setForm({ city: profile.city || '', displayName: profile.displayName || '' });
-    }
+    if (profile) setForm({ city: profile.city || '', displayName: profile.displayName || '' });
   }, [profile]);
 
-  const handleSave = async () => {
+  const save = async (e) => {
+    e.preventDefault();
     setSaving(true); setError(''); setSaved(false);
     try {
       await userAPI.updateProfile(form);
-      if (refreshProfile) await refreshProfile();
-      setSaved(true); setTimeout(() => setSaved(false), 3000);
+      await refreshProfile();
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
     } catch (e) { setError(e.response?.data?.error || e.message); }
     finally { setSaving(false); }
   };
@@ -33,75 +37,74 @@ export default function SettingsPage() {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
-          // Reverse geocode using OpenStreetMap Nominatim (free, no key needed)
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`
-          );
+          // Reverse geocode with OpenStreetMap Nominatim (free, no key)
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`);
           const data = await res.json();
           const city = data.address?.city || data.address?.town || data.address?.village || '';
           setForm((f) => ({ ...f, city }));
-          // Also save lat/lon to backend
           await userAPI.updateProfile({ lat: pos.coords.latitude, lon: pos.coords.longitude, city });
-        } catch { /* silent */ }
+        } catch { setError('Could not detect your city.'); }
         finally { setLocating(false); }
       },
-      () => setLocating(false),
+      () => { setLocating(false); setError('Location permission was denied.'); },
       { timeout: 8000 }
     );
   };
 
+  const signOut = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  const name = form.displayName || user?.displayName || 'You';
+  const photo = profile?.photoURL || user?.photoURL;
+
   return (
-    <div>
-      <PageHeader title="Settings" subtitle="Manage your account and preferences" />
-      <div className="max-w-xl space-y-5">
-        {/* Profile */}
-        <Card>
-          <CardHeader title="Profile" subtitle="Your account information" />
-          <CardBody>
-            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-black/[0.06]">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-amber to-rose flex items-center justify-center font-syne font-black text-xl text-white overflow-hidden">
-                {profile?.photoURL
-                  ? <img src={profile.photoURL} alt="" className="w-full h-full object-cover" />
-                  : (form.displayName || 'U').slice(0, 2).toUpperCase()}
-              </div>
-              <div>
-                <div className="font-syne font-bold text-ink">{form.displayName || user?.displayName}</div>
-                <div className="text-sm text-ink3">{user?.email}</div>
-                <div className="text-xs text-ink3 font-mono mt-0.5">
-                  {profile?.githubConnected
-                    ? <span className="text-teal2">✓ GitHub: @{profile.githubUsername}</span>
-                    : <span className="text-ink3 opacity-60">GitHub not connected</span>}
-                </div>
-              </div>
+    <div className="max-w-2xl">
+      <PageHeader title="Settings" />
+
+      <Card className="mb-4 flex items-center gap-4">
+        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm text-xl font-bold">
+          {photo ? <img src={photo} alt="" referrerPolicy="no-referrer" className="h-full w-full object-cover" /> : initials(name)}
+        </div>
+        <div className="min-w-0">
+          <div className="text-lg font-bold">{name}</div>
+          <div className="truncate text-sm text-olive">{user?.email}</div>
+          <div className="mt-1 text-xs text-olive">
+            {profile?.githubConnected ? `GitHub: @${profile.githubUsername}` : 'GitHub not connected'}
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mb-4">
+        <CardTitle title="Profile" />
+        <form onSubmit={save} className="space-y-4">
+          <div>
+            <label htmlFor="displayName" className="mb-1.5 block text-sm font-semibold">Display name</label>
+            <input id="displayName" className="input" value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder="Your name" />
+          </div>
+          <div>
+            <label htmlFor="city" className="mb-1.5 block text-sm font-semibold">City for weather</label>
+            <div className="flex gap-2">
+              <input id="city" className="input" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="e.g. Udaipur" />
+              <button type="button" onClick={detectLocation} disabled={locating} className="btn-secondary">
+                <MapPin size={16} aria-hidden="true" /> {locating ? 'Detecting…' : 'Detect'}
+              </button>
             </div>
+            <p className="mt-1.5 text-xs text-olive">Used when browser location isn't available.</p>
+          </div>
 
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-mono text-ink3 uppercase tracking-[1.5px] mb-1.5">Display Name</label>
-                <input className="input" value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder="Your name" />
-              </div>
-              <div>
-                <label className="block text-xs font-mono text-ink3 uppercase tracking-[1.5px] mb-1.5">City (for Weather)</label>
-                <div className="flex gap-2">
-                  <input className="input flex-1" value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="e.g. Mumbai" />
-                  <button onClick={detectLocation} disabled={locating} className="btn-outline whitespace-nowrap text-xs py-2">
-                    {locating ? '…' : '📍 Detect'}
-                  </button>
-                </div>
-                <p className="text-xs text-ink3 mt-1.5">Used as fallback when geolocation is unavailable</p>
-              </div>
-            </div>
+          {error && <ErrorMsg message={error} />}
+          {saved && <p role="status" className="rounded bg-forest/10 px-4 py-3 text-sm font-semibold text-forest">Settings saved</p>}
 
-            {error && <div className="mt-4"><ErrorMsg message={error} /></div>}
-            {saved && <div className="mt-4 text-teal2 text-sm bg-teal2/5 border border-teal2/20 rounded-xl px-4 py-3">✓ Settings saved</div>}
+          <button type="submit" disabled={saving} className="btn-primary">{saving ? 'Saving…' : 'Save changes'}</button>
+        </form>
+      </Card>
 
-            <button onClick={handleSave} disabled={saving} className="btn-primary mt-5 w-full justify-center flex">
-              {saving ? 'Saving…' : 'Save Settings'}
-            </button>
-          </CardBody>
-        </Card>
-
-      </div>
+      <Card>
+        <CardTitle title="Account" subtitle="Signed in with Google" />
+        <button onClick={signOut} className="btn-secondary"><LogOut size={16} aria-hidden="true" /> Sign out</button>
+      </Card>
     </div>
   );
 }
