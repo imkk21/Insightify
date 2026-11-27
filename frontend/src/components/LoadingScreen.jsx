@@ -1,20 +1,10 @@
+import { Logo } from './Brand';
+
 export default function LoadingScreen() {
   return (
-    <div className="fixed inset-0 bg-background flex flex-col items-center justify-center z-50">
-      <div className="mb-6">
-        <span className="font-syne font-black text-3xl text-ink tracking-tight">
-          Insightify<span className="text-amber">.</span>
-        </span>
-      </div>
-      <div className="flex gap-1.5">
-        {[0, 1, 2].map((i) => (
-          <span
-            key={i}
-            className="w-2 h-2 rounded-full bg-amber animate-pulse-dot"
-            style={{ animationDelay: `${i * 0.2}s` }}
-          />
-        ))}
-      </div>
+    <div role="status" aria-label="Loading" className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-white">
+      <Logo />
+      <span className="h-6 w-6 animate-spin rounded-full border-2 border-sand border-t-plum" />
     </div>
   );
 }

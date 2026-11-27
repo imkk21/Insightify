@@ -33,7 +33,9 @@ A developer dashboard that combines your GitHub activity, local weather and tech
 
 ## 🛠 Tech Stack
 
-**Frontend** — React 18, Vite 5, Tailwind CSS, Framer Motion, Recharts, Lucide icons, Firebase Auth SDK. Deployed on Vercel.
+**Frontend** — React 18, Vite 5, Tailwind CSS, Lucide icons, Firebase Auth SDK. Deployed on Vercel.
+
+**Design** — Warm, flat, image-first design system documented in [`DESIGN.md`](DESIGN.md): sand/olive neutrals, plum-black text, a single red accent for primary actions, generous rounding and masonry grids.
 
 **Backend** — Node.js, Express, MongoDB Atlas (Mongoose), Firebase Admin, Google Gemini (`@google/generative-ai`), node-cron. Deployed on Render.
 

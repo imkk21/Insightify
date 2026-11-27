@@ -1,128 +1,71 @@
-import { useEffect, useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Sun, Moon, LayoutDashboard, GitBranch, CloudRain, Newspaper, Bot, Activity, Settings, LogOut, Music as MusicIcon, ListTodo, Zap, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Logo, Footer } from './Brand';
 import MusicFloatingPlayer from './MusicFloatingPlayer';
+import { initials } from '../utils';
 
-const navItems = [
-  { label: 'Dashboard',   to: '/', end: true, icon: <LayoutDashboard size={18} /> },
-  { label: 'GitHub Stats',to: '/github', icon: <GitBranch size={18} /> },
-  { label: 'Weather',     to: '/weather', icon: <CloudRain size={18} /> },
-  { label: 'Tech News',   to: '/news', icon: <Newspaper size={18} /> },
-  { label: 'Music',        to: '/music', icon: <MusicIcon size={18} /> },
-  { label: 'Tasks',        to: '/tasks', icon: <ListTodo size={18} /> },
-  { label: 'AI Assistant', to: '/assistant', icon: <Zap size={18} /> },
-  { label: 'AI Insights', to: '/insight', icon: <Bot size={18} /> },
-  { label: 'Activity',    to: '/activity', icon: <Activity size={18} /> },
-  { label: 'Settings',    to: '/settings', icon: <Settings size={18} /> },
+const NAV = [
+  { label: 'Home',      to: '/', end: true },
+  { label: 'Insights',  to: '/insight' },
+  { label: 'GitHub',    to: '/github' },
+  { label: 'Activity',  to: '/activity' },
+  { label: 'Weather',   to: '/weather' },
+  { label: 'News',      to: '/news' },
+  { label: 'Music',     to: '/music' },
+  { label: 'Tasks',     to: '/tasks' },
+  { label: 'Assistant', to: '/assistant' },
 ];
 
 export default function Layout() {
-  const { user, profile, logout } = useAuth();
-  const navigate = useNavigate();
-  const [isMobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [theme, setTheme] = useState(localStorage.getItem('theme') || 'dark');
-  useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-
-  const toggleTheme = () => setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-
-  const initials = (profile?.displayName || user?.displayName || user?.name || 'U')
-    .split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase();
+  const { user, profile } = useAuth();
+  const name = profile?.displayName || user?.displayName || 'You';
+  const photo = profile?.photoURL || user?.photoURL;
 
   return (
-    <div className="flex min-h-screen bg-background text-foreground transition-colors duration-500 overflow-x-hidden">
-      {/* Mobile Top Bar */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 h-16 border-b border-border bg-card/80 backdrop-blur-3xl z-[100] flex items-center justify-between px-6">
-        <div className="font-syne font-black text-lg text-foreground tracking-tight flex items-center gap-2">
-          <div className="w-6 h-6 bg-amber rounded flex items-center justify-center text-[#1a1714] text-xs font-black">I</div>
-          Insightify
+    <div className="flex min-h-screen flex-col">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur">
+        {/* Below xl the nav wraps to its own horizontally scrolling row */}
+        <div className="mx-auto flex max-w-[1680px] flex-wrap items-center gap-x-6 px-4 sm:px-6">
+          <Link to="/" aria-label="Insightify home" className="flex h-16 items-center">
+            <Logo />
+          </Link>
+
+          <nav
+            aria-label="Main"
+            className="no-scrollbar order-last -mx-4 flex w-[calc(100%+2rem)] gap-1 overflow-x-auto px-4 pb-3 sm:-mx-6 sm:w-[calc(100%+3rem)] sm:px-6 xl:order-none xl:mx-0 xl:w-auto xl:flex-1 xl:px-0 xl:pb-0"
+          >
+            {NAV.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  `shrink-0 rounded px-4 py-2.5 font-semibold transition-colors ${
+                    isActive ? 'bg-plum text-white' : 'text-plum hover:bg-sand'
+                  }`
+                }
+              >
+                {item.label}
+              </NavLink>
+            ))}
+          </nav>
+
+          <Link
+            to="/settings"
+            aria-label="Settings"
+            title="Settings"
+            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-warm text-sm font-bold hover:ring-4 hover:ring-sand xl:ml-0"
+          >
+            {photo ? <img src={photo} alt="" referrerPolicy="no-referrer" className="h-full w-full object-cover" /> : initials(name)}
+          </Link>
         </div>
-        <button 
-          onClick={() => setMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 rounded-xl bg-foreground/5 text-foreground hover:bg-foreground/10 transition-all shadow-inner border border-border"
-        >
-          {isMobileMenuOpen ? <X size={20} /> : <div className="space-y-1"><div className="w-5 h-0.5 bg-foreground" /><div className="w-5 h-0.5 bg-foreground" /><div className="w-5 h-0.5 bg-foreground" /></div>}
-        </button>
       </header>
 
-      {/* Sidebar - Desktop & Mobile Drawer */}
-      <aside className={`fixed left-0 top-0 bottom-0 w-[280px] border-r border-border bg-card backdrop-blur-3xl flex flex-col z-[110] transition-transform duration-500 lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-
-        
-        {/* Logo */}
-        <div className="px-8 py-10 border-b border-border">
-          <div className="font-syne font-black text-2xl text-foreground tracking-tight flex items-center gap-2">
-            <div className="w-8 h-8 bg-amber rounded-lg flex items-center justify-center text-[#1a1714] text-lg shadow-lg shadow-amber/20 font-black">I</div>
-            Insightify<span className="text-amber">.</span>
-          </div>
-          <div className="text-[10px] font-mono text-ink3 tracking-[3px] uppercase mt-2 opacity-60">Intelligence Core v3</div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 px-5 py-6 overflow-y-auto scrollbar-hide space-y-1">
-          <div className="text-[10px] font-mono text-ink3/40 tracking-[3px] uppercase px-4 pb-4">Primary Systems</div>
-          {navItems.slice(0, 7).map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.end}
-              onClick={() => setMobileMenuOpen(false)}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-              {item.icon} <span className="tracking-tight">{item.label}</span>
-            </NavLink>
-          ))}
-          <div className="text-[10px] font-mono text-ink3/40 tracking-[3px] uppercase px-4 pb-4 pt-8">Neural Analytics</div>
-          {navItems.slice(7).map((item) => (
-            <NavLink key={item.to} to={item.to}
-              onClick={() => setMobileMenuOpen(false)}
-              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
-              {item.icon} <span className="tracking-tight">{item.label}</span>
-            </NavLink>
-          ))}
-        </nav>
-
-        {/* Footer: User + Theme */}
-        <div className="px-5 py-6 border-t border-border space-y-4 bg-background/50 backdrop-blur-md">
-          <div className="flex items-center gap-3 bg-card p-3 rounded-3xl border border-border shadow-sm backdrop-blur-xl">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber via-rose to-teal2 flex items-center justify-center font-bold text-sm text-white flex-shrink-0 overflow-hidden shadow-2xl ring-2 ring-white/10">
-              {profile?.photoURL ? <img src={profile.photoURL} alt="" /> : initials}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-bold text-foreground truncate tracking-tight">{profile?.displayName || user?.displayName || user?.name || 'Member'}</div>
-            </div>
-            <button onClick={toggleTheme} className="p-2.5 rounded-2xl bg-background border border-border text-foreground hover:border-amber transition-all active:scale-95">
-              {theme === 'dark' ? <Sun size={15} className="text-amber" /> : <Moon size={15} className="text-indigo" />}
-            </button>
-          </div>
-          
-          <button 
-            onClick={async () => { await logout(); navigate('/login'); }}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl text-[11px] font-mono font-bold uppercase tracking-[3px] text-ink3/40 hover:text-rose hover:bg-rose/5 transition-all"
-          >
-            <LogOut size={14} /> Termination Protocol
-          </button>
-        </div>
-      </aside>
-
-      {/* Mobile Overlay */}
-      <AnimatePresence>
-        {isMobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setMobileMenuOpen(false)}
-            className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[105]"
-          />
-        )}
-      </AnimatePresence>
-
-      <main className="flex-1 lg:ml-[280px] relative z-10 min-h-screen p-5 md:p-8 lg:p-14 overflow-y-auto overflow-x-hidden transition-all duration-500 bg-background/50 pt-24 lg:pt-14">
-        <div className="max-w-[1600px] mx-auto relative">
-          <Outlet />
-        </div>
+      <main className="mx-auto w-full max-w-[1680px] flex-1 px-4 py-8 sm:px-6">
+        <Outlet />
       </main>
+
+      <Footer links={[...NAV, { label: 'Settings', to: '/settings' }]} />
       <MusicFloatingPlayer />
     </div>
   );
